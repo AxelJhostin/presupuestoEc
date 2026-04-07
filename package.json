@@ -11,6 +11,7 @@
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.1.1",
     "@hugeicons/react": "^1.1.6",
+    "@react-pdf/renderer": "^4.4.0",
     "@supabase/ssr": "^0.10.0",
     "@supabase/supabase-js": "^2.101.1",
     "class-variance-authority": "^0.7.1",
@@ -29,6 +30,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-pdf": "^6.2.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "postcss": "^8",

@@ -99,6 +99,13 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           >
             Volver al dashboard
           </Link>
+          <a
+            href={`/api/pdf?id=${presupuesto.id}`}
+            target="_blank"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors"
+          >
+            Descargar PDF
+          </a>
         </div>
 
       </main>
