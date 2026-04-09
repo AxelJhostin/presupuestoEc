@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Calculator, FileText } from 'lucide-react'
+import LogoutButton from '@/components/LogoutButton'
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -19,7 +20,10 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-slate-50">
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-slate-900">PresupuestoEC</h1>
-        <span className="text-sm text-slate-500">{user.email}</span>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-slate-500">{user.email}</span>
+          <LogoutButton />
+        </div>
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-10">

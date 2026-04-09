@@ -1,6 +1,7 @@
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import DeleteButton from '@/components/DeleteButton'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -106,6 +107,7 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           >
             Descargar PDF
           </a>
+          <DeleteButton id={presupuesto.id} />
         </div>
 
       </main>
