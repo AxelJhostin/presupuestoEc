@@ -8,7 +8,9 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Trash2, Plus } from 'lucide-react'
+import { Trash2, Plus, BookOpen } from 'lucide-react'
+import CatalogoSelector from '@/components/CatalogoSelector'
+import type { ItemCatalogo } from '@/lib/catalogo'
 
 interface FilaItem {
   tempId: string
@@ -18,11 +20,11 @@ interface FilaItem {
   precio_unitario: string
 }
 
-function nuevaFila(): FilaItem {
+function nuevaFila(item?: ItemCatalogo): FilaItem {
   return {
     tempId: crypto.randomUUID(),
-    descripcion: '',
-    unidad: 'und',
+    descripcion: item?.descripcion || '',
+    unidad: item?.unidad || 'und',
     cantidad: '',
     precio_unitario: '',
   }
@@ -34,6 +36,7 @@ export default function FreePage() {
   const [nombre, setNombre] = useState('')
   const [filas, setFilas] = useState<FilaItem[]>([nuevaFila()])
   const [loading, setLoading] = useState(false)
+  const [mostrarCatalogo, setMostrarCatalogo] = useState(false)
 
   function handleChange(tempId: string, campo: keyof FilaItem, valor: string) {
     setFilas(prev => prev.map(f => f.tempId === tempId ? { ...f, [campo]: valor } : f))
@@ -46,6 +49,16 @@ export default function FreePage() {
   function eliminarFila(tempId: string) {
     if (filas.length === 1) return
     setFilas(prev => prev.filter(f => f.tempId !== tempId))
+  }
+
+  function agregarDesdeCatalogo(item: ItemCatalogo) {
+    // Si ya existe ese item, no duplicar — solo hacer focus
+    const existe = filas.find(f => f.descripcion === item.descripcion)
+    if (existe) {
+      toast.info(`"${item.descripcion}" ya está en la lista.`)
+      return
+    }
+    setFilas(prev => [...prev.filter(f => f.descripcion.trim() !== ''), nuevaFila(item)])
   }
 
   const total = filas.reduce((acc, f) => {
@@ -86,16 +99,16 @@ export default function FreePage() {
       return
     }
 
-    const itemsToInsert = filasValidas.map((f, i) => ({
-      presupuesto_id: presupuesto.id,
-      descripcion: f.descripcion.trim(),
-      unidad: f.unidad || 'und',
-      cantidad: parseFloat(f.cantidad) || 0,
-      precio_unitario: parseFloat(f.precio_unitario) || 0,
-      orden: i,
-    }))
-
-    const { error: errI } = await supabase.from('items_presupuesto').insert(itemsToInsert)
+    const { error: errI } = await supabase.from('items_presupuesto').insert(
+      filasValidas.map((f, i) => ({
+        presupuesto_id: presupuesto.id,
+        descripcion: f.descripcion.trim(),
+        unidad: f.unidad || 'und',
+        cantidad: parseFloat(f.cantidad) || 0,
+        precio_unitario: parseFloat(f.precio_unitario) || 0,
+        orden: i,
+      }))
+    )
 
     if (errI) {
       toast.error('Error al guardar los items.')
@@ -116,7 +129,7 @@ export default function FreePage() {
         <h1 className="text-lg font-semibold text-slate-900">Modo Libre</h1>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-10 space-y-8">
+      <main className="max-w-4xl mx-auto px-6 py-10 space-y-6">
 
         {/* Nombre */}
         <div className="space-y-1.5">
@@ -129,7 +142,24 @@ export default function FreePage() {
           />
         </div>
 
-        {/* Tabla editable */}
+        {/* Catálogo toggle */}
+        <div>
+          <button
+            onClick={() => setMostrarCatalogo(!mostrarCatalogo)}
+            className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+          >
+            <BookOpen className="w-4 h-4" />
+            {mostrarCatalogo ? 'Ocultar catálogo' : 'Agregar desde catálogo'}
+          </button>
+
+          {mostrarCatalogo && (
+            <div className="mt-3">
+              <CatalogoSelector onSelect={agregarDesdeCatalogo} />
+            </div>
+          )}
+        </div>
+
+        {/* Tabla */}
         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100">
             <h3 className="font-semibold text-slate-900">Items del presupuesto</h3>
@@ -172,6 +202,7 @@ export default function FreePage() {
                         <Input
                           type="number"
                           placeholder="0"
+                          min="0"
                           value={fila.cantidad}
                           onChange={e => handleChange(fila.tempId, 'cantidad', e.target.value)}
                           className="h-8 text-sm text-right"
@@ -181,6 +212,7 @@ export default function FreePage() {
                         <Input
                           type="number"
                           placeholder="0.00"
+                          min="0"
                           value={fila.precio_unitario}
                           onChange={e => handleChange(fila.tempId, 'precio_unitario', e.target.value)}
                           className="h-8 text-sm text-right"
@@ -218,7 +250,7 @@ export default function FreePage() {
               className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
             >
               <Plus className="w-4 h-4" />
-              Agregar fila
+              Agregar fila manualmente
             </button>
             <Button onClick={handleGuardar} disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar presupuesto'}
