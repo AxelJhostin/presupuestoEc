@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getUser } from '@/lib/getUser'
 import DeleteButton from '@/components/DeleteButton'
+import DuplicarButton from '@/components/DuplicarButton'
+
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -91,12 +93,19 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           </table>
         </div>
 
-        <div className="flex gap-3">
+        {/* Acciones */}
+        <div className="flex flex-wrap gap-3">
           <Link
             href="/dashboard"
             className="border border-slate-300 text-slate-700 text-sm font-medium px-4 py-2 rounded-md hover:bg-slate-50 transition-colors"
           >
             Volver al dashboard
+          </Link>
+          <Link
+            href={`/dashboard/edit/${presupuesto.id}`}
+            className="border border-slate-300 text-slate-700 text-sm font-medium px-4 py-2 rounded-md hover:bg-slate-50 transition-colors flex items-center gap-1.5"
+          >
+            Editar
           </Link>
           <a
             href={`/api/pdf?id=${presupuesto.id}`}
@@ -105,6 +114,7 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           >
             Descargar PDF
           </a>
+          <DuplicarButton id={presupuesto.id} />
           <DeleteButton id={presupuesto.id} />
         </div>
 
