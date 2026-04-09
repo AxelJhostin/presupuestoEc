@@ -6,6 +6,7 @@ import { Calendar, Tag, ArrowLeft, Pencil, Copy, Trash2, FileDown } from 'lucide
 import DeleteButton from '@/components/DeleteButton'
 import DuplicarButton from '@/components/DuplicarButton'
 import ListaCompras from '@/components/ListaCompras'
+import NotasPresupuesto from '@/components/NotasPresupuesto'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -147,6 +148,11 @@ export default async function PresupuestoPage({ params }: { params: { id: string
             estado: (item.estado || 'pendiente') as 'pendiente' | 'comprado' | 'parcial',
           }))}
           presupuestoId={presupuesto.id}
+        />
+
+        <NotasPresupuesto
+          presupuestoId={presupuesto.id}
+          notasIniciales={presupuesto.notas || ''}
         />
 
         {/* Acciones móvil */}

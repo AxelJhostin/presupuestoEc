@@ -35,10 +35,10 @@ export default function DuplicarButton({ id }: { id: string }) {
     <button
       onClick={handleDuplicar}
       disabled={loading}
-      className="flex items-center gap-1.5 border border-slate-300 text-slate-700 text-sm font-medium px-3 py-2 rounded-md hover:bg-slate-50 transition-colors"
+      className="flex items-center gap-1.5 border border-slate-200 text-slate-600 text-sm font-medium px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors"
     >
-      <Copy className="w-4 h-4" />
-      {loading ? 'Duplicando...' : 'Duplicar'}
+      <Copy className="w-3.5 h-3.5" />
+      <span className="hidden sm:block">{loading ? 'Duplicando...' : 'Duplicar'}</span>
     </button>
   )
 }
