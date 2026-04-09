@@ -9,15 +9,36 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Plus, Trash2 } from 'lucide-react'
 import { calcularLosa, losaAItems } from '@/lib/formulas/losa'
 import { calcularColumna, columnaAItems } from '@/lib/formulas/columna'
 import { calcularPintura, pinturaAItems } from '@/lib/formulas/pintura'
 import { calcularMamposteria, mamposteriaAItems } from '@/lib/formulas/mamposteria'
 import { calcularCeramica, ceramicaAItems } from '@/lib/formulas/ceramica'
 import { calcularContrapiso, contrapisoAItems } from '@/lib/formulas/contrapiso'
+import TablaItems from '@/components/TablaItems'
 import ComparadorProveedores from '@/components/ComparadorProveedores'
+import SeccionesPresupuesto from '@/components/SeccionesPresupuesto'
 
 type Elemento = 'losa' | 'columna' | 'pintura' | 'mamposteria' | 'ceramica' | 'contrapiso'
+
+interface ItemCalculado {
+  tempId: string
+  etiqueta: string
+  descripcion: string
+  unidad: string
+  cantidad: number
+  precio_unitario: number
+}
+
+const ETIQUETAS: Record<Elemento, string> = {
+  losa: 'Losa maciza',
+  columna: 'Columna',
+  pintura: 'Pintura',
+  mamposteria: 'Mampostería',
+  ceramica: 'Cerámica',
+  contrapiso: 'Contrapiso',
+}
 
 export default function CalculatorPage() {
   const router = useRouter()
@@ -25,6 +46,7 @@ export default function CalculatorPage() {
   const [elemento, setElemento] = useState<Elemento>('losa')
   const [nombre, setNombre] = useState('')
   const [loading, setLoading] = useState(false)
+  const [itemsAcumulados, setItemsAcumulados] = useState<ItemCalculado[]>([])
 
   // Losa
   const [losaLargo, setLosaLargo] = useState('')
@@ -59,44 +81,65 @@ export default function CalculatorPage() {
   const [ctrEspesor, setCtrEspesor] = useState('0.08')
   const [ctrMalla, setCtrMalla] = useState(true)
 
-  const [items, setItems] = useState<{descripcion:string, cantidad:number, unidad:string, precio_unitario:number}[]>([])
-  const [calculado, setCalculado] = useState(false)
-
   function handleCalcular() {
+    let nuevosItems: { descripcion: string; unidad: string; cantidad: number }[] = []
+
     if (elemento === 'losa') {
       const r = calcularLosa({ largo: parseFloat(losaLargo), ancho: parseFloat(losaAncho), espesor: parseFloat(losaEspesor) })
-      setItems(losaAItems(r).map(i => ({ ...i, precio_unitario: 0 })))
+      nuevosItems = losaAItems(r)
     } else if (elemento === 'columna') {
       const r = calcularColumna({ ancho: parseFloat(colAncho), profundidad: parseFloat(colProfundidad), altura: parseFloat(colAltura) })
-      setItems(columnaAItems(r).map(i => ({ ...i, precio_unitario: 0 })))
+      nuevosItems = columnaAItems(r)
     } else if (elemento === 'pintura') {
       const r = calcularPintura({ largo: parseFloat(pintLargo), alto: parseFloat(pintAlto), numero_manos: pintManos, area_vanos_m2: parseFloat(pintVanos) || 0 })
-      setItems(pinturaAItems(r, pintManos).map(i => ({ ...i, precio_unitario: 0 })))
+      nuevosItems = pinturaAItems(r, pintManos)
     } else if (elemento === 'mamposteria') {
       const r = calcularMamposteria({ largo: parseFloat(mampLargo), alto: parseFloat(mampAlto), area_vanos_m2: parseFloat(mampVanos) || 0 })
-      setItems(mamposteriaAItems(r).map(i => ({ ...i, precio_unitario: 0 })))
+      nuevosItems = mamposteriaAItems(r)
     } else if (elemento === 'ceramica') {
       const r = calcularCeramica({ largo: parseFloat(cerLargo), ancho: parseFloat(cerAncho), area_vanos_m2: parseFloat(cerVanos) || 0, tamano_ceramica: cerTamano })
-      setItems(ceramicaAItems(r, cerTamano).map(i => ({ ...i, precio_unitario: 0 })))
+      nuevosItems = ceramicaAItems(r, cerTamano)
     } else if (elemento === 'contrapiso') {
       const r = calcularContrapiso({ largo: parseFloat(ctrLargo), ancho: parseFloat(ctrAncho), espesor: parseFloat(ctrEspesor), con_malla: ctrMalla })
-      setItems(contrapisoAItems(r).map(i => ({ ...i, precio_unitario: 0 })))
+      nuevosItems = contrapisoAItems(r)
     }
-    setCalculado(true)
+
+    const itemsConId = nuevosItems.map(i => ({
+      tempId: crypto.randomUUID(),
+      etiqueta: ETIQUETAS[elemento],
+      descripcion: i.descripcion,
+      unidad: i.unidad,
+      cantidad: i.cantidad,
+      precio_unitario: 0,
+    }))
+
+    setItemsAcumulados(prev => [...prev, ...itemsConId])
+    toast.success(`${ETIQUETAS[elemento]} agregado — ${nuevosItems.length} materiales`)
   }
 
-  function handlePrecioChange(index: number, valor: string) {
-    const num = parseFloat(valor) || 0
-    setItems(prev => prev.map((item, i) =>
-      i === index ? { ...item, precio_unitario: Math.max(0, num) } : item
-    ))
+  function handlePrecioChange(tempId: string, valor: string) {
+    const num = Math.max(0, parseFloat(valor) || 0)
+    setItemsAcumulados(prev => prev.map(i => i.tempId === tempId ? { ...i, precio_unitario: num } : i))
   }
 
-  const total = items.reduce((acc, item) => acc + item.cantidad * item.precio_unitario, 0)
+  function eliminarItem(tempId: string) {
+    setItemsAcumulados(prev => prev.filter(i => i.tempId !== tempId))
+  }
+
+  const total = itemsAcumulados.reduce((acc, i) => acc + i.cantidad * i.precio_unitario, 0)
+
+  const itemsParaComponentes = itemsAcumulados.map(i => ({
+    id: i.tempId,
+    descripcion: i.descripcion,
+    unidad: i.unidad,
+    cantidad: i.cantidad,
+    precio_unitario: i.precio_unitario,
+    subtotal: i.cantidad * i.precio_unitario,
+  }))
 
   async function handleGuardar() {
     if (!nombre.trim()) { toast.error('Ingresa un nombre para el presupuesto.'); return }
-    if (!calculado) { toast.error('Primero calcula los materiales.'); return }
+    if (itemsAcumulados.length === 0) { toast.error('Agrega al menos un elemento calculado.'); return }
 
     setLoading(true)
 
@@ -112,10 +155,10 @@ export default function CalculatorPage() {
       .select()
       .single()
 
-    if (errP || !presupuesto) { toast.error('Error al guardar el presupuesto.'); setLoading(false); return }
+    if (errP || !presupuesto) { toast.error('Error al guardar.'); setLoading(false); return }
 
     const { error: errI } = await supabase.from('items_presupuesto').insert(
-      items.map((item, i) => ({
+      itemsAcumulados.map((item, i) => ({
         presupuesto_id: presupuesto.id,
         descripcion: item.descripcion,
         unidad: item.unidad,
@@ -138,16 +181,23 @@ export default function CalculatorPage() {
         <h1 className="text-lg font-semibold text-slate-900">Modo Calculadora</h1>
       </header>
 
-      <main className="max-w-2xl mx-auto px-6 py-10 space-y-8">
+      <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
 
+        {/* Nombre */}
         <div className="space-y-1.5">
           <Label htmlFor="nombre">Nombre del proyecto</Label>
-          <Input id="nombre" placeholder="Ej: Casa Sr. Pérez — Losa planta baja" value={nombre} onChange={e => setNombre(e.target.value)} />
+          <Input
+            id="nombre"
+            placeholder="Ej: Casa Sr. Pérez — Obra completa"
+            value={nombre}
+            onChange={e => setNombre(e.target.value)}
+          />
         </div>
 
+        {/* Selector */}
         <div className="space-y-3">
           <Label>Elemento constructivo</Label>
-          <Tabs value={elemento} onValueChange={v => { setElemento(v as Elemento); setCalculado(false); setItems([]) }}>
+          <Tabs value={elemento} onValueChange={v => setElemento(v as Elemento)}>
             <TabsList className="w-full flex-wrap h-auto">
               <TabsTrigger value="losa" className="flex-1">Losa</TabsTrigger>
               <TabsTrigger value="columna" className="flex-1">Columna</TabsTrigger>
@@ -159,8 +209,8 @@ export default function CalculatorPage() {
           </Tabs>
         </div>
 
+        {/* Formulario */}
         <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
-
           {elemento === 'losa' && (
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={losaLargo} onChange={e => setLosaLargo(e.target.value)} /></div>
@@ -168,7 +218,6 @@ export default function CalculatorPage() {
               <div className="space-y-1.5"><Label>Espesor (m)</Label><Input type="number" placeholder="0.20" value={losaEspesor} onChange={e => setLosaEspesor(e.target.value)} /></div>
             </div>
           )}
-
           {elemento === 'columna' && (
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5"><Label>Ancho (m)</Label><Input type="number" placeholder="0.30" value={colAncho} onChange={e => setColAncho(e.target.value)} /></div>
@@ -176,7 +225,6 @@ export default function CalculatorPage() {
               <div className="space-y-1.5"><Label>Altura (m)</Label><Input type="number" placeholder="3.00" value={colAltura} onChange={e => setColAltura(e.target.value)} /></div>
             </div>
           )}
-
           {elemento === 'pintura' && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={pintLargo} onChange={e => setPintLargo(e.target.value)} /></div>
@@ -192,7 +240,6 @@ export default function CalculatorPage() {
               <div className="space-y-1.5"><Label>Vanos a descontar (m²)</Label><Input type="number" placeholder="0" value={pintVanos} onChange={e => setPintVanos(e.target.value)} /></div>
             </div>
           )}
-
           {elemento === 'mamposteria' && (
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={mampLargo} onChange={e => setMampLargo(e.target.value)} /></div>
@@ -200,7 +247,6 @@ export default function CalculatorPage() {
               <div className="space-y-1.5"><Label>Vanos a descontar (m²)</Label><Input type="number" placeholder="0" value={mampVanos} onChange={e => setMampVanos(e.target.value)} /></div>
             </div>
           )}
-
           {elemento === 'ceramica' && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={cerLargo} onChange={e => setCerLargo(e.target.value)} /></div>
@@ -217,7 +263,6 @@ export default function CalculatorPage() {
               <div className="space-y-1.5"><Label>Vanos a descontar (m²)</Label><Input type="number" placeholder="0" value={cerVanos} onChange={e => setCerVanos(e.target.value)} /></div>
             </div>
           )}
-
           {elemento === 'contrapiso' && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={ctrLargo} onChange={e => setCtrLargo(e.target.value)} /></div>
@@ -232,72 +277,73 @@ export default function CalculatorPage() {
             </div>
           )}
 
-          <Button onClick={handleCalcular} className="w-full">Calcular materiales</Button>
+          <Button onClick={handleCalcular} className="w-full">
+            <Plus className="w-4 h-4 mr-2" />
+            Calcular y agregar al presupuesto
+          </Button>
         </div>
 
-        {calculado && items.length > 0 && (
+        {/* Items acumulados agrupados por elemento */}
+        {itemsAcumulados.length > 0 && (
           <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100">
-              <h3 className="font-semibold text-slate-900">Materiales — ingresa precios unitarios</h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
-                  <tr>
-                    <th className="px-4 py-3 text-left">Material</th>
-                    <th className="px-4 py-3 text-right">Cant.</th>
-                    <th className="px-4 py-3 text-center hidden sm:table-cell">Unidad</th>
-                    <th className="px-4 py-3 text-right">Precio</th>
-                    <th className="px-4 py-3 text-right hidden sm:table-cell">Subtotal</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {items.map((item, i) => (
-                    <tr key={i}>
-                      <td className="px-4 py-3 text-slate-700">{item.descripcion}</td>
-                      <td className="px-4 py-3 text-right text-slate-600">{item.cantidad}</td>
-                      <td className="px-4 py-3 text-center text-slate-500 hidden sm:table-cell">{item.unidad}</td>
-                      <td className="px-4 py-3 text-right">
-                        <Input
-                          type="number"
-                          className="w-20 text-right h-8 text-sm"
-                          placeholder="0.00"
-                          value={item.precio_unitario === 0 ? '' : item.precio_unitario}
-                          onChange={e => handlePrecioChange(i, e.target.value)}
-                        />
-                      </td>
-                      <td className="px-4 py-3 text-right text-slate-700 font-medium hidden sm:table-cell">
-                        ${(item.cantidad * item.precio_unitario).toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot className="bg-slate-50 border-t border-slate-200">
-                  <tr>
-                    <td colSpan={3} className="px-4 py-3 text-right font-semibold text-slate-900">TOTAL</td>
-                    <td colSpan={2} className="px-4 py-3 text-right font-bold text-slate-900">${total.toFixed(2)}</td>
-                  </tr>
-                </tfoot>
-              </table>
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="font-semibold text-slate-900">Materiales acumulados</h3>
+              <span className="text-xs text-slate-400">{itemsAcumulados.length} items</span>
             </div>
 
-            {calculado && items.length > 0 && (
-            <ComparadorProveedores
-              items={items.map(item => ({
-                id: `${elemento}-${item.descripcion}`,
-                descripcion: item.descripcion,
-                unidad: item.unidad,
-                cantidad: item.cantidad,
-              }))}
-            />
-            )}
-            
-            <div className="px-6 py-4 border-t border-slate-100">
-              <Button onClick={handleGuardar} disabled={loading} className="w-full">
-                {loading ? 'Guardando...' : 'Guardar presupuesto'}
-              </Button>
+            {Array.from(new Set(itemsAcumulados.map(i => i.etiqueta))).map(etiqueta => {
+              const grupo = itemsAcumulados.filter(i => i.etiqueta === etiqueta)
+              return (
+                <div key={etiqueta}>
+                  <div className="px-6 py-2 bg-blue-50 border-b border-slate-100 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-blue-700 uppercase tracking-wide">{etiqueta}</span>
+                    <button
+                      onClick={() => setItemsAcumulados(prev => prev.filter(i => i.etiqueta !== etiqueta))}
+                      className="text-xs text-slate-400 hover:text-red-400 transition-colors flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Quitar sección
+                    </button>
+                  </div>
+                  <TablaItems
+                    items={grupo.map(i => ({ id: i.tempId, descripcion: i.descripcion, unidad: i.unidad, cantidad: i.cantidad, precio_unitario: i.precio_unitario }))}
+                    onPrecioChange={handlePrecioChange}
+                    onEliminar={eliminarItem}
+                    total={grupo.reduce((acc, i) => acc + i.cantidad * i.precio_unitario, 0)}
+                  />
+                </div>
+              )
+            })}
+
+            <div className="px-6 py-4 bg-slate-50 border-t-2 border-blue-600 flex items-center justify-between">
+              <span className="font-bold text-slate-900">TOTAL GENERAL</span>
+              <span className="font-bold text-blue-600 text-xl">${total.toFixed(2)}</span>
             </div>
           </div>
+        )}
+
+        {/* Secciones */}
+        {itemsParaComponentes.length > 0 && (
+          <SeccionesPresupuesto items={itemsParaComponentes} />
+        )}
+
+        {/* Comparador */}
+        {itemsParaComponentes.length > 0 && (
+          <ComparadorProveedores
+            items={itemsParaComponentes.map(i => ({
+              id: i.id,
+              descripcion: i.descripcion,
+              unidad: i.unidad,
+              cantidad: i.cantidad,
+            }))}
+          />
+        )}
+
+        {/* Guardar */}
+        {itemsAcumulados.length > 0 && (
+          <Button onClick={handleGuardar} disabled={loading} className="w-full" size="lg">
+            {loading ? 'Guardando...' : 'Guardar presupuesto completo'}
+          </Button>
         )}
 
       </main>
