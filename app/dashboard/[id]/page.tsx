@@ -7,6 +7,7 @@ import DeleteButton from '@/components/DeleteButton'
 import DuplicarButton from '@/components/DuplicarButton'
 import ListaCompras from '@/components/ListaCompras'
 import NotasPresupuesto from '@/components/NotasPresupuesto'
+import ResumenFinanciero from '@/components/ResumenFinanciero'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -149,6 +150,8 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           }))}
           presupuestoId={presupuesto.id}
         />
+
+        <ResumenFinanciero subtotal={Number(presupuesto.total)} />
 
         <NotasPresupuesto
           presupuestoId={presupuesto.id}
