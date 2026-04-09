@@ -9,6 +9,7 @@ import ListaCompras from '@/components/ListaCompras'
 import NotasPresupuesto from '@/components/NotasPresupuesto'
 import ResumenFinanciero from '@/components/ResumenFinanciero'
 import ComparadorProveedores from '@/components/ComparadorProveedores'
+import ExcelButton from '@/components/ExcelButton'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -68,6 +69,19 @@ export default async function PresupuestoPage({ params }: { params: { id: string
               <FileDown className="w-3.5 h-3.5" />
               <span className="hidden sm:block">PDF</span>
             </a>
+            <ExcelButton
+              nombre={presupuesto.nombre}
+              modo={presupuesto.modo}
+              fecha={fecha}
+              total={Number(presupuesto.total)}
+              items={(items || []).map(item => ({
+                descripcion: item.descripcion,
+                unidad: item.unidad,
+                cantidad: Number(item.cantidad),
+                precio_unitario: Number(item.precio_unitario),
+                subtotal: Number(item.subtotal),
+              }))}
+            />
             <DuplicarButton id={presupuesto.id} />
             <DeleteButton id={presupuesto.id} />
           </div>
@@ -188,6 +202,7 @@ export default async function PresupuestoPage({ params }: { params: { id: string
             Descargar PDF
           </a>
         </div>
+        
 
       </main>
     </div>
