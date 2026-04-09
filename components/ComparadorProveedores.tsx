@@ -9,18 +9,6 @@ interface Proveedor {
   nombre: string
 }
 
-interface Cotizacion {
-  proveedorId: string
-  precio: string
-}
-
-interface ItemComparador {
-  id: string
-  descripcion: string
-  unidad: string
-  cantidad: number
-  cotizaciones: Record<string, string>
-}
 
 interface Props {
   items: {
