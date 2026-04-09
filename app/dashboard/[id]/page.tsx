@@ -138,6 +138,8 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           </div>
         </div>
 
+        
+
         {/* Lista de compras */}
         <ListaCompras
           items={(items || []).map(item => ({

@@ -12,6 +12,7 @@ import { Trash2, Plus, BookOpen } from 'lucide-react'
 import CatalogoSelector from '@/components/CatalogoSelector'
 import type { ItemCatalogo } from '@/lib/catalogo'
 import ComparadorProveedores from '@/components/ComparadorProveedores'
+import SeccionesPresupuesto from '@/components/SeccionesPresupuesto'
 
 interface FilaItem {
   tempId: string
@@ -53,7 +54,6 @@ export default function FreePage() {
   }
 
   function agregarDesdeCatalogo(item: ItemCatalogo) {
-    // Si ya existe ese item, no duplicar — solo hacer focus
     const existe = filas.find(f => f.descripcion === item.descripcion)
     if (existe) {
       toast.info(`"${item.descripcion}" ya está en la lista.`)
@@ -67,6 +67,18 @@ export default function FreePage() {
     const precio = parseFloat(f.precio_unitario) || 0
     return acc + cantidad * precio
   }, 0)
+
+  // Items con subtotal para componentes que lo necesitan
+  const itemsConSubtotal = filas
+    .filter(f => f.descripcion.trim())
+    .map(f => ({
+      id: f.tempId,
+      descripcion: f.descripcion,
+      unidad: f.unidad,
+      cantidad: parseFloat(f.cantidad) || 0,
+      precio_unitario: parseFloat(f.precio_unitario) || 0,
+      subtotal: (parseFloat(f.cantidad) || 0) * (parseFloat(f.precio_unitario) || 0),
+    }))
 
   async function handleGuardar() {
     if (!nombre.trim()) {
@@ -143,7 +155,7 @@ export default function FreePage() {
           />
         </div>
 
-        {/* Catálogo toggle */}
+        {/* Catálogo */}
         <div>
           <button
             onClick={() => setMostrarCatalogo(!mostrarCatalogo)}
@@ -152,7 +164,6 @@ export default function FreePage() {
             <BookOpen className="w-4 h-4" />
             {mostrarCatalogo ? 'Ocultar catálogo' : 'Agregar desde catálogo'}
           </button>
-
           {mostrarCatalogo && (
             <div className="mt-3">
               <CatalogoSelector onSelect={agregarDesdeCatalogo} />
@@ -258,20 +269,24 @@ export default function FreePage() {
             </Button>
           </div>
         </div>
-        
-        {filas.some(f => f.descripcion.trim()) && (
-        <ComparadorProveedores
-          items={filas
-            .filter(f => f.descripcion.trim())
-            .map(f => ({
-              id: f.tempId,
-              descripcion: f.descripcion,
-              unidad: f.unidad,
-              cantidad: parseFloat(f.cantidad) || 0,
+
+        {/* Secciones — solo si hay items con descripción */}
+        {itemsConSubtotal.length > 0 && (
+          <SeccionesPresupuesto items={itemsConSubtotal} />
+        )}
+
+        {/* Comparador — solo si hay items con descripción */}
+        {itemsConSubtotal.length > 0 && (
+          <ComparadorProveedores
+            items={itemsConSubtotal.map(i => ({
+              id: i.id,
+              descripcion: i.descripcion,
+              unidad: i.unidad,
+              cantidad: i.cantidad,
             }))}
-        />
-      )}
-      
+          />
+        )}
+
       </main>
     </div>
   )
