@@ -74,7 +74,8 @@ export default function EditarPresupuestoPage({ params }: { params: { id: string
       setCargando(false)
     }
     cargar()
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [])
 
   function handleChange(tempId: string, campo: keyof FilaItem, valor: string) {
     setFilas(prev => prev.map(f => f.tempId === tempId ? { ...f, [campo]: valor } : f))

@@ -79,4 +79,4 @@ export const CATALOGO: ItemCatalogo[] = [
   { descripcion: "Maestro de obra (jornal)", unidad: "día", categoria: "Mano de obra" },
 ]
 
-export const CATEGORIAS = [...new Set(CATALOGO.map(i => i.categoria))]
+export const CATEGORIAS = Array.from(new Set(CATALOGO.map(i => i.categoria)))

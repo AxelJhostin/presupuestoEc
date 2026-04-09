@@ -48,7 +48,8 @@ export default function PerfilPage() {
       setLoading(false)
     }
     cargarPerfil()
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [])
 
   async function handleGuardar(e: React.FormEvent) {
     e.preventDefault()
