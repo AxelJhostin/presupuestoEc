@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getUser } from '@/lib/getUser'
 import DeleteButton from '@/components/DeleteButton'
 import DuplicarButton from '@/components/DuplicarButton'
-
+import ListaCompras from '@/components/ListaCompras'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -44,6 +44,7 @@ export default async function PresupuestoPage({ params }: { params: { id: string
 
       <main className="max-w-4xl mx-auto px-6 py-10 space-y-6">
 
+        {/* Info */}
         <div className="bg-white border border-slate-200 rounded-lg px-6 py-4 flex flex-wrap gap-6 text-sm">
           <div>
             <span className="text-slate-500">Fecha</span>
@@ -59,6 +60,7 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           </div>
         </div>
 
+        {/* Tabla de items */}
         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100">
             <h3 className="font-semibold text-slate-900">Detalle de materiales</h3>
@@ -93,6 +95,20 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           </table>
         </div>
 
+        {/* Lista de compras */}
+        <ListaCompras
+          items={(items || []).map(item => ({
+            id: item.id,
+            descripcion: item.descripcion,
+            unidad: item.unidad,
+            cantidad: Number(item.cantidad),
+            precio_unitario: Number(item.precio_unitario),
+            subtotal: Number(item.subtotal),
+            estado: (item.estado || 'pendiente') as 'pendiente' | 'comprado' | 'parcial',
+          }))}
+          presupuestoId={presupuesto.id}
+        />
+
         {/* Acciones */}
         <div className="flex flex-wrap gap-3">
           <Link
@@ -103,7 +119,7 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           </Link>
           <Link
             href={`/dashboard/edit/${presupuesto.id}`}
-            className="border border-slate-300 text-slate-700 text-sm font-medium px-4 py-2 rounded-md hover:bg-slate-50 transition-colors flex items-center gap-1.5"
+            className="border border-slate-300 text-slate-700 text-sm font-medium px-4 py-2 rounded-md hover:bg-slate-50 transition-colors"
           >
             Editar
           </Link>
