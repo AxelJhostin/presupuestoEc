@@ -34,6 +34,13 @@ export async function GET(request: NextRequest) {
     .eq('presupuesto_id', id)
     .order('orden')
 
+  // Obtener datos del perfil del ingeniero
+  const { data: perfil } = await supabase
+    .from('usuarios')
+    .select('nombre, telefono, empresa, email')
+    .eq('id', user.userId)
+    .single()
+
   const fecha = new Date(presupuesto.fecha).toLocaleDateString('es-EC', {
     year: 'numeric',
     month: 'long',
@@ -46,6 +53,12 @@ export async function GET(request: NextRequest) {
     fecha,
     total: presupuesto.total,
     items: items || [],
+    ingeniero: {
+      nombre: perfil?.nombre || '',
+      email: perfil?.email || '',
+      telefono: perfil?.telefono || '',
+      empresa: perfil?.empresa || '',
+    },
   }) as unknown as React.ReactElement<{ children?: React.ReactNode }>
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -8,18 +8,34 @@ const styles = StyleSheet.create({
     color: '#1e293b',
   },
   header: {
-    marginBottom: 24,
+    marginBottom: 20,
     borderBottomWidth: 2,
     borderBottomColor: '#1d4ed8',
     paddingBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   logo: {
     fontSize: 18,
     fontFamily: 'Helvetica-Bold',
     color: '#1d4ed8',
   },
-  subtitle: {
+  logoSubtitle: {
     fontSize: 9,
+    color: '#64748b',
+    marginTop: 2,
+  },
+  ingenieroBlock: {
+    textAlign: 'right',
+  },
+  ingenieroNombre: {
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: '#1e293b',
+  },
+  ingenieroDetalle: {
+    fontSize: 8,
     color: '#64748b',
     marginTop: 2,
   },
@@ -118,23 +134,41 @@ interface Item {
   subtotal: number
 }
 
+interface Ingeniero {
+  nombre: string
+  email: string
+  telefono: string
+  empresa: string
+}
+
 interface Props {
   nombre: string
   modo: string
   fecha: string
   total: number
   items: Item[]
+  ingeniero?: Ingeniero
 }
 
-export default function PresupuestoPDF({ nombre, modo, fecha, total, items }: Props) {
+export default function PresupuestoPDF({ nombre, modo, fecha, total, items, ingeniero }: Props) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
 
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.logo}>PresupuestoEC</Text>
-          <Text style={styles.subtitle}>Generador de presupuestos de obra — Ecuador</Text>
+          <View>
+            <Text style={styles.logo}>PresupuestoEC</Text>
+            <Text style={styles.logoSubtitle}>Generador de presupuestos de obra — Ecuador</Text>
+          </View>
+          {ingeniero && (ingeniero.nombre || ingeniero.empresa) && (
+            <View style={styles.ingenieroBlock}>
+              {ingeniero.nombre ? <Text style={styles.ingenieroNombre}>{ingeniero.nombre}</Text> : null}
+              {ingeniero.empresa ? <Text style={styles.ingenieroDetalle}>{ingeniero.empresa}</Text> : null}
+              {ingeniero.telefono ? <Text style={styles.ingenieroDetalle}>{ingeniero.telefono}</Text> : null}
+              {ingeniero.email ? <Text style={styles.ingenieroDetalle}>{ingeniero.email}</Text> : null}
+            </View>
+          )}
         </View>
 
         {/* Info */}

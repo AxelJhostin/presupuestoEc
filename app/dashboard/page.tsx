@@ -22,7 +22,9 @@ export default async function DashboardPage() {
       <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-slate-900">PresupuestoEC</h1>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-slate-500">{user.email}</span>
+          <Link href="/dashboard/perfil" className="text-sm text-slate-500 hover:text-slate-700 transition-colors">
+            {user.email}
+          </Link>
           <LogoutButton />
         </div>
       </header>
