@@ -66,9 +66,9 @@ export default async function PresupuestoPage({ params }: { params: { id: string
             <thead className="bg-slate-50 text-slate-500 text-xs uppercase">
               <tr>
                 <th className="px-4 py-3 text-left">Descripción</th>
-                <th className="px-4 py-3 text-center">Unidad</th>
+                <th className="px-4 py-3 text-center hidden sm:table-cell">Unidad</th>
                 <th className="px-4 py-3 text-right">Cantidad</th>
-                <th className="px-4 py-3 text-right">Precio unit.</th>
+                <th className="px-4 py-3 text-right hidden sm:table-cell">Precio unit.</th>
                 <th className="px-4 py-3 text-right">Subtotal</th>
               </tr>
             </thead>
@@ -76,9 +76,9 @@ export default async function PresupuestoPage({ params }: { params: { id: string
               {items?.map(item => (
                 <tr key={item.id}>
                   <td className="px-4 py-3 text-slate-700">{item.descripcion}</td>
-                  <td className="px-4 py-3 text-center text-slate-500">{item.unidad}</td>
+                  <td className="px-4 py-3 text-center text-slate-500 hidden sm:table-cell">{item.unidad}</td>
                   <td className="px-4 py-3 text-right text-slate-600">{item.cantidad}</td>
-                  <td className="px-4 py-3 text-right text-slate-600">${Number(item.precio_unitario).toFixed(2)}</td>
+                  <td className="px-4 py-3 text-right text-slate-600 hidden sm:table-cell">${Number(item.precio_unitario).toFixed(2)}</td>
                   <td className="px-4 py-3 text-right font-medium text-slate-900">${Number(item.subtotal).toFixed(2)}</td>
                 </tr>
               ))}
