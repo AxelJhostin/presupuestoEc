@@ -1,19 +1,20 @@
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/getUser'
 import DeleteButton from '@/components/DeleteButton'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
+  const user = getUser()
   if (!user) redirect('/login')
+
+  const supabase = createClient()
 
   const { data: presupuesto } = await supabase
     .from('presupuestos')
     .select('*')
     .eq('id', params.id)
-    .eq('user_id', user.id)
+    .eq('user_id', user.userId)
     .single()
 
   if (!presupuesto) notFound()
@@ -41,7 +42,6 @@ export default async function PresupuestoPage({ params }: { params: { id: string
 
       <main className="max-w-4xl mx-auto px-6 py-10 space-y-6">
 
-        {/* Info */}
         <div className="bg-white border border-slate-200 rounded-lg px-6 py-4 flex flex-wrap gap-6 text-sm">
           <div>
             <span className="text-slate-500">Fecha</span>
@@ -57,7 +57,6 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           </div>
         </div>
 
-        {/* Tabla de items */}
         <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100">
             <h3 className="font-semibold text-slate-900">Detalle de materiales</h3>
@@ -92,7 +91,6 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           </table>
         </div>
 
-        {/* Acciones */}
         <div className="flex gap-3">
           <Link
             href="/dashboard"

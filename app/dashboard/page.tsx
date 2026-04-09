@@ -1,19 +1,20 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/getUser'
 import { Calculator, FileText } from 'lucide-react'
 import LogoutButton from '@/components/LogoutButton'
 
 export default async function DashboardPage() {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
+  const user = getUser()
   if (!user) redirect('/login')
+
+  const supabase = createClient()
 
   const { data: presupuestos } = await supabase
     .from('presupuestos')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', user.userId)
     .order('fecha', { ascending: false })
 
   return (

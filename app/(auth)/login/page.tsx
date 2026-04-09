@@ -1,17 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 export default function LoginPage() {
-  const router = useRouter()
-  const supabase = createClient()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -20,29 +16,31 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
 
-    if (error) {
-      toast.error('Credenciales incorrectas. Verifica tu email y contraseña.')
+    const data = await res.json()
+
+    if (!res.ok) {
+      toast.error(data.error)
       setLoading(false)
       return
     }
 
-    router.push('/dashboard')
-    router.refresh()
+    window.location.href = '/dashboard'
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
-
-        {/* Logo */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-slate-900">PresupuestoEC</h1>
           <p className="text-sm text-slate-500 mt-1">Ingresa a tu cuenta</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="email">Correo electrónico</Label>
@@ -75,14 +73,12 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        {/* Link a registro */}
         <p className="text-center text-sm text-slate-500 mt-6">
           ¿No tienes cuenta?{' '}
           <Link href="/register" className="text-blue-600 hover:underline font-medium">
             Regístrate gratis
           </Link>
         </p>
-
       </div>
     </div>
   )

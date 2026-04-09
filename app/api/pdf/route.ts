@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { renderToBuffer } from '@react-pdf/renderer'
 import { createClient } from '@/lib/supabase/server'
+import { verifyToken } from '@/lib/auth'
 import PresupuestoPDF from '@/components/pdf/PresupuestoPDF'
 import React from 'react'
 
@@ -10,16 +11,19 @@ export async function GET(request: NextRequest) {
 
   if (!id) return NextResponse.json({ error: 'ID requerido' }, { status: 400 })
 
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const token = request.cookies.get('auth_token')?.value
+  if (!token) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
-  if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  const user = verifyToken(token)
+  if (!user) return NextResponse.json({ error: 'Token inválido' }, { status: 401 })
+
+  const supabase = createClient()
 
   const { data: presupuesto } = await supabase
     .from('presupuestos')
     .select('*')
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('user_id', user.userId)
     .single()
 
   if (!presupuesto) return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
@@ -45,8 +49,7 @@ export async function GET(request: NextRequest) {
   }) as unknown as React.ReactElement<{ children?: React.ReactNode }>
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const buffer = await renderToBuffer(element as any)
-
+  const buffer = await renderToBuffer(element as any)
   const uint8Array = new Uint8Array(buffer)
 
   return new NextResponse(uint8Array, {

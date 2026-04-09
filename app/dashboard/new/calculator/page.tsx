@@ -16,7 +16,6 @@ import type { ElementoNEC } from '@/types/presupuesto'
 
 export default function CalculatorPage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const [elemento, setElemento] = useState<ElementoNEC>('losa')
   const [nombre, setNombre] = useState('')
@@ -66,8 +65,9 @@ export default function CalculatorPage() {
   }
 
   function handlePrecioChange(index: number, valor: string) {
+    const num = parseFloat(valor) || 0
     setItems(prev => prev.map((item, i) =>
-      i === index ? { ...item, precio_unitario: parseFloat(valor) || 0 } : item
+      i === index ? { ...item, precio_unitario: Math.max(0, num) } : item
     ))
   }
 
@@ -85,12 +85,15 @@ export default function CalculatorPage() {
 
     setLoading(true)
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
+    const res = await fetch('/api/auth/me')
+    if (!res.ok) { router.push('/login'); return }
+    const { userId } = await res.json()
+
+    const supabase = createClient()
 
     const { data: presupuesto, error: errP } = await supabase
       .from('presupuestos')
-      .insert({ user_id: user.id, nombre: nombre.trim(), modo: 'calculadora', total })
+      .insert({ user_id: userId, nombre: nombre.trim(), modo: 'calculadora', total })
       .select()
       .single()
 

@@ -8,7 +8,6 @@ import { Trash2 } from 'lucide-react'
 
 export default function DeleteButton({ id }: { id: string }) {
   const router = useRouter()
-  const supabase = createClient()
   const [confirming, setConfirming] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -20,6 +19,8 @@ export default function DeleteButton({ id }: { id: string }) {
     }
 
     setLoading(true)
+
+    const supabase = createClient()
     const { error } = await supabase
       .from('presupuestos')
       .delete()

@@ -30,7 +30,6 @@ function nuevaFila(): FilaItem {
 
 export default function FreePage() {
   const router = useRouter()
-  const supabase = createClient()
 
   const [nombre, setNombre] = useState('')
   const [filas, setFilas] = useState<FilaItem[]>([nuevaFila()])
@@ -69,12 +68,15 @@ export default function FreePage() {
 
     setLoading(true)
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
+    const res = await fetch('/api/auth/me')
+    if (!res.ok) { router.push('/login'); return }
+    const { userId } = await res.json()
+
+    const supabase = createClient()
 
     const { data: presupuesto, error: errP } = await supabase
       .from('presupuestos')
-      .insert({ user_id: user.id, nombre: nombre.trim(), modo: 'libre', total })
+      .insert({ user_id: userId, nombre: nombre.trim(), modo: 'libre', total })
       .select()
       .single()
 

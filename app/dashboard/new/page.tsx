@@ -1,12 +1,10 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/getUser'
 import { Calculator, FileText } from 'lucide-react'
 
 export default async function NewPresupuestoPage() {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
+  const user = getUser()
   if (!user) redirect('/login')
 
   return (
@@ -25,7 +23,6 @@ export default async function NewPresupuestoPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Modo Calculadora */}
           <Link
             href="/dashboard/new/calculator"
             className="group bg-white border border-slate-200 rounded-lg p-6 hover:border-blue-400 hover:shadow-md transition-all"
@@ -42,7 +39,6 @@ export default async function NewPresupuestoPage() {
             </div>
           </Link>
 
-          {/* Modo Libre */}
           <Link
             href="/dashboard/new/free"
             className="group bg-white border border-slate-200 rounded-lg p-6 hover:border-slate-400 hover:shadow-md transition-all"
