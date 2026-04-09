@@ -15,6 +15,7 @@ import { calcularPintura, pinturaAItems } from '@/lib/formulas/pintura'
 import { calcularMamposteria, mamposteriaAItems } from '@/lib/formulas/mamposteria'
 import { calcularCeramica, ceramicaAItems } from '@/lib/formulas/ceramica'
 import { calcularContrapiso, contrapisoAItems } from '@/lib/formulas/contrapiso'
+import ComparadorProveedores from '@/components/ComparadorProveedores'
 
 type Elemento = 'losa' | 'columna' | 'pintura' | 'mamposteria' | 'ceramica' | 'contrapiso'
 
@@ -279,6 +280,18 @@ export default function CalculatorPage() {
                 </tfoot>
               </table>
             </div>
+
+            {calculado && items.length > 0 && (
+            <ComparadorProveedores
+              items={items.map(item => ({
+                id: `${elemento}-${item.descripcion}`,
+                descripcion: item.descripcion,
+                unidad: item.unidad,
+                cantidad: item.cantidad,
+              }))}
+            />
+            )}
+            
             <div className="px-6 py-4 border-t border-slate-100">
               <Button onClick={handleGuardar} disabled={loading} className="w-full">
                 {loading ? 'Guardando...' : 'Guardar presupuesto'}

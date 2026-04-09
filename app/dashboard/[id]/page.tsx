@@ -8,6 +8,7 @@ import DuplicarButton from '@/components/DuplicarButton'
 import ListaCompras from '@/components/ListaCompras'
 import NotasPresupuesto from '@/components/NotasPresupuesto'
 import ResumenFinanciero from '@/components/ResumenFinanciero'
+import ComparadorProveedores from '@/components/ComparadorProveedores'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -152,6 +153,15 @@ export default async function PresupuestoPage({ params }: { params: { id: string
         />
 
         <ResumenFinanciero subtotal={Number(presupuesto.total)} />
+
+        <ComparadorProveedores
+          items={(items || []).map(item => ({
+            id: item.id,
+            descripcion: item.descripcion,
+            unidad: item.unidad,
+            cantidad: Number(item.cantidad),
+          }))}
+        />
 
         <NotasPresupuesto
           presupuestoId={presupuesto.id}

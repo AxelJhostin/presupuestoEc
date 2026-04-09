@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Trash2, Plus, BookOpen } from 'lucide-react'
 import CatalogoSelector from '@/components/CatalogoSelector'
 import type { ItemCatalogo } from '@/lib/catalogo'
+import ComparadorProveedores from '@/components/ComparadorProveedores'
 
 interface FilaItem {
   tempId: string
@@ -257,7 +258,20 @@ export default function FreePage() {
             </Button>
           </div>
         </div>
-
+        
+        {filas.some(f => f.descripcion.trim()) && (
+        <ComparadorProveedores
+          items={filas
+            .filter(f => f.descripcion.trim())
+            .map(f => ({
+              id: f.tempId,
+              descripcion: f.descripcion,
+              unidad: f.unidad,
+              cantidad: parseFloat(f.cantidad) || 0,
+            }))}
+        />
+      )}
+      
       </main>
     </div>
   )
