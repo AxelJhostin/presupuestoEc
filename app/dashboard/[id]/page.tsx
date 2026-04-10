@@ -229,6 +229,7 @@ export default async function PresupuestoPage({ params }: { params: { id: string
             unidad: item.unidad,
             cantidad: Number(item.cantidad),
           }))}
+          presupuestoId={presupuesto.id}
         />
 
         <NotasPresupuesto
