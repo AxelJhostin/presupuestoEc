@@ -19,6 +19,7 @@ import { calcularContrapiso, contrapisoAItems } from '@/lib/formulas/contrapiso'
 import TablaItems from '@/components/TablaItems'
 import ComparadorProveedores from '@/components/ComparadorProveedores'
 import SeccionesPresupuesto from '@/components/SeccionesPresupuesto'
+import ClienteForm, { type ClienteData } from '@/components/ClienteForm'
 
 type Elemento = 'losa' | 'columna' | 'pintura' | 'mamposteria' | 'ceramica' | 'contrapiso'
 
@@ -47,6 +48,11 @@ export default function CalculatorPage() {
   const [nombre, setNombre] = useState('')
   const [loading, setLoading] = useState(false)
   const [itemsAcumulados, setItemsAcumulados] = useState<ItemCalculado[]>([])
+  const [cliente, setCliente] = useState<ClienteData>({
+    cliente_nombre: '',
+    cliente_telefono: '',
+    cliente_ruc: '',
+  })
 
   // Losa
   const [losaLargo, setLosaLargo] = useState('')
@@ -137,6 +143,12 @@ export default function CalculatorPage() {
     subtotal: i.cantidad * i.precio_unitario,
   }))
 
+  async function obtenerNumero(userId: string): Promise<number> {
+    const supabase = createClient()
+    const { data } = await supabase.rpc('generar_numero_presupuesto', { p_user_id: userId })
+    return data || 1
+  }
+
   async function handleGuardar() {
     if (!nombre.trim()) { toast.error('Ingresa un nombre para el presupuesto.'); return }
     if (itemsAcumulados.length === 0) { toast.error('Agrega al menos un elemento calculado.'); return }
@@ -148,10 +160,18 @@ export default function CalculatorPage() {
     const { userId } = await res.json()
 
     const supabase = createClient()
+    const numeroPresupuesto = await obtenerNumero(userId)
 
     const { data: presupuesto, error: errP } = await supabase
       .from('presupuestos')
-      .insert({ user_id: userId, nombre: nombre.trim(), modo: 'calculadora', total })
+      .insert({
+        user_id: userId,
+        nombre: nombre.trim(),
+        modo: 'calculadora',
+        total,
+        numero: numeroPresupuesto,
+        ...cliente,
+      })
       .select()
       .single()
 
@@ -193,6 +213,9 @@ export default function CalculatorPage() {
             onChange={e => setNombre(e.target.value)}
           />
         </div>
+
+        {/* Cliente */}
+        <ClienteForm value={cliente} onChange={setCliente} />
 
         {/* Selector */}
         <div className="space-y-3">

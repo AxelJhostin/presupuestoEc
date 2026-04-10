@@ -13,6 +13,7 @@ import CatalogoSelector from '@/components/CatalogoSelector'
 import type { ItemCatalogo } from '@/lib/catalogo'
 import ComparadorProveedores from '@/components/ComparadorProveedores'
 import SeccionesPresupuesto from '@/components/SeccionesPresupuesto'
+import ClienteForm, { type ClienteData } from '@/components/ClienteForm'
 
 interface FilaItem {
   tempId: string
@@ -39,6 +40,11 @@ export default function FreePage() {
   const [filas, setFilas] = useState<FilaItem[]>([nuevaFila()])
   const [loading, setLoading] = useState(false)
   const [mostrarCatalogo, setMostrarCatalogo] = useState(false)
+  const [cliente, setCliente] = useState<ClienteData>({
+    cliente_nombre: '',
+    cliente_telefono: '',
+    cliente_ruc: '',
+  })
 
   function handleChange(tempId: string, campo: keyof FilaItem, valor: string) {
     setFilas(prev => prev.map(f => f.tempId === tempId ? { ...f, [campo]: valor } : f))
@@ -68,7 +74,6 @@ export default function FreePage() {
     return acc + cantidad * precio
   }, 0)
 
-  // Items con subtotal para componentes que lo necesitan
   const itemsConSubtotal = filas
     .filter(f => f.descripcion.trim())
     .map(f => ({
@@ -79,6 +84,12 @@ export default function FreePage() {
       precio_unitario: parseFloat(f.precio_unitario) || 0,
       subtotal: (parseFloat(f.cantidad) || 0) * (parseFloat(f.precio_unitario) || 0),
     }))
+
+  async function obtenerNumero(userId: string): Promise<number> {
+    const supabase = createClient()
+    const { data } = await supabase.rpc('generar_numero_presupuesto', { p_user_id: userId })
+    return data || 1
+  }
 
   async function handleGuardar() {
     if (!nombre.trim()) {
@@ -99,10 +110,18 @@ export default function FreePage() {
     const { userId } = await res.json()
 
     const supabase = createClient()
+    const numeroPresupuesto = await obtenerNumero(userId)
 
     const { data: presupuesto, error: errP } = await supabase
       .from('presupuestos')
-      .insert({ user_id: userId, nombre: nombre.trim(), modo: 'libre', total })
+      .insert({
+        user_id: userId,
+        nombre: nombre.trim(),
+        modo: 'libre',
+        total,
+        numero: numeroPresupuesto,
+        ...cliente,
+      })
       .select()
       .single()
 
@@ -154,6 +173,9 @@ export default function FreePage() {
             onChange={e => setNombre(e.target.value)}
           />
         </div>
+
+        {/* Cliente */}
+        <ClienteForm value={cliente} onChange={setCliente} />
 
         {/* Catálogo */}
         <div>
@@ -270,12 +292,12 @@ export default function FreePage() {
           </div>
         </div>
 
-        {/* Secciones — solo si hay items con descripción */}
+        {/* Secciones */}
         {itemsConSubtotal.length > 0 && (
           <SeccionesPresupuesto items={itemsConSubtotal} />
         )}
 
-        {/* Comparador — solo si hay items con descripción */}
+        {/* Comparador */}
         {itemsConSubtotal.length > 0 && (
           <ComparadorProveedores
             items={itemsConSubtotal.map(i => ({

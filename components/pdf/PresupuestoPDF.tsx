@@ -41,8 +41,8 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: 'row',
-    gap: 24,
-    marginBottom: 20,
+    gap: 16,
+    marginBottom: 12,
   },
   infoBlock: {
     flex: 1,
@@ -57,6 +57,37 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Helvetica-Bold',
     color: '#1e293b',
+  },
+  clienteBox: {
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 4,
+    padding: 10,
+    marginBottom: 16,
+  },
+  clienteTitle: {
+    fontSize: 8,
+    color: '#64748b',
+    textTransform: 'uppercase',
+    marginBottom: 6,
+  },
+  clienteRow: {
+    flexDirection: 'row',
+    gap: 24,
+  },
+  clienteItem: {
+    flex: 1,
+  },
+  clienteLabel: {
+    fontSize: 7,
+    color: '#94a3b8',
+    marginBottom: 1,
+  },
+  clienteValue: {
+    fontSize: 9,
+    color: '#1e293b',
+    fontFamily: 'Helvetica-Bold',
   },
   tableHeader: {
     flexDirection: 'row',
@@ -148,9 +179,26 @@ interface Props {
   total: number
   items: Item[]
   ingeniero?: Ingeniero
+  numero?: number
+  cliente_nombre?: string
+  cliente_telefono?: string
+  cliente_ruc?: string
 }
 
-export default function PresupuestoPDF({ nombre, modo, fecha, total, items, ingeniero }: Props) {
+export default function PresupuestoPDF({
+  nombre,
+  modo,
+  fecha,
+  total,
+  items,
+  ingeniero,
+  numero,
+  cliente_nombre,
+  cliente_telefono,
+  cliente_ruc,
+}: Props) {
+  const tieneCliente = cliente_nombre || cliente_telefono || cliente_ruc
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -171,12 +219,18 @@ export default function PresupuestoPDF({ nombre, modo, fecha, total, items, inge
           )}
         </View>
 
-        {/* Info */}
+        {/* Info del presupuesto */}
         <View style={styles.infoRow}>
           <View style={styles.infoBlock}>
             <Text style={styles.infoLabel}>Proyecto</Text>
             <Text style={styles.infoValue}>{nombre}</Text>
           </View>
+          {numero && (
+            <View style={styles.infoBlock}>
+              <Text style={styles.infoLabel}>N° Presupuesto</Text>
+              <Text style={styles.infoValue}>P-{String(numero).padStart(3, '0')}</Text>
+            </View>
+          )}
           <View style={styles.infoBlock}>
             <Text style={styles.infoLabel}>Modo</Text>
             <Text style={styles.infoValue}>{modo === 'calculadora' ? 'Calculadora NEC' : 'Modo Libre'}</Text>
@@ -186,6 +240,33 @@ export default function PresupuestoPDF({ nombre, modo, fecha, total, items, inge
             <Text style={styles.infoValue}>{fecha}</Text>
           </View>
         </View>
+
+        {/* Datos del cliente */}
+        {tieneCliente && (
+          <View style={styles.clienteBox}>
+            <Text style={styles.clienteTitle}>Cliente</Text>
+            <View style={styles.clienteRow}>
+              {cliente_nombre ? (
+                <View style={styles.clienteItem}>
+                  <Text style={styles.clienteLabel}>Nombre</Text>
+                  <Text style={styles.clienteValue}>{cliente_nombre}</Text>
+                </View>
+              ) : null}
+              {cliente_ruc ? (
+                <View style={styles.clienteItem}>
+                  <Text style={styles.clienteLabel}>RUC / Cédula</Text>
+                  <Text style={styles.clienteValue}>{cliente_ruc}</Text>
+                </View>
+              ) : null}
+              {cliente_telefono ? (
+                <View style={styles.clienteItem}>
+                  <Text style={styles.clienteLabel}>Teléfono</Text>
+                  <Text style={styles.clienteValue}>{cliente_telefono}</Text>
+                </View>
+              ) : null}
+            </View>
+          </View>
+        )}
 
         {/* Tabla */}
         <View style={styles.tableHeader}>

@@ -11,6 +11,8 @@ import ResumenFinanciero from '@/components/ResumenFinanciero'
 import ComparadorProveedores from '@/components/ComparadorProveedores'
 import ExcelButton from '@/components/ExcelButton'
 import SeccionesPresupuesto from '@/components/SeccionesPresupuesto'
+import { Hash, User } from 'lucide-react'
+
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -98,6 +100,15 @@ export default async function PresupuestoPage({ params }: { params: { id: string
 
         {/* Info */}
         <div className="bg-white border border-slate-200 rounded-lg px-6 py-5 flex flex-wrap gap-6">
+          {presupuesto.numero && (
+            <div className="flex items-center gap-2 text-sm">
+              <Hash className="w-4 h-4 text-slate-400" />
+              <span className="text-slate-500">N°:</span>
+              <span className="font-medium text-slate-900">
+                P-{String(presupuesto.numero).padStart(3, '0')}
+              </span>
+            </div>
+          )}
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="w-4 h-4 text-slate-400" />
             <span className="text-slate-500">Fecha:</span>
@@ -114,6 +125,19 @@ export default async function PresupuestoPage({ params }: { params: { id: string
               {presupuesto.modo === 'calculadora' ? 'Calculadora NEC' : 'Modo libre'}
             </span>
           </div>
+          {presupuesto.cliente_nombre && (
+            <div className="flex items-center gap-2 text-sm">
+              <User className="w-4 h-4 text-slate-400" />
+              <span className="text-slate-500">Cliente:</span>
+              <span className="font-medium text-slate-900">{presupuesto.cliente_nombre}</span>
+              {presupuesto.cliente_ruc && (
+                <span className="text-slate-400 text-xs">· RUC: {presupuesto.cliente_ruc}</span>
+              )}
+              {presupuesto.cliente_telefono && (
+                <span className="text-slate-400 text-xs">· {presupuesto.cliente_telefono}</span>
+              )}
+            </div>
+          )}
           <div className="ml-auto">
             <span className="text-slate-500 text-sm">Total: </span>
             <span className="text-xl font-bold text-slate-900">${Number(presupuesto.total).toFixed(2)}</span>

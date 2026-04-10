@@ -59,6 +59,10 @@ export async function GET(request: NextRequest) {
       telefono: perfil?.telefono || '',
       empresa: perfil?.empresa || '',
     },
+    numero: presupuesto.numero || undefined,
+    cliente_nombre: presupuesto.cliente_nombre || undefined,
+    cliente_telefono: presupuesto.cliente_telefono || undefined,
+    cliente_ruc: presupuesto.cliente_ruc || undefined,
   }) as unknown as React.ReactElement<{ children?: React.ReactNode }>
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
