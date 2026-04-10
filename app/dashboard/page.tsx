@@ -7,6 +7,7 @@ import LogoutButton from '@/components/LogoutButton'
 import StatsBar from '@/components/dashboard/StatsBar'
 import FiltrosDashboard from '@/components/dashboard/FiltrosDashboard'
 import EmptyState from '@/components/dashboard/EmptyState'
+import { Calculator } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -34,6 +35,13 @@ export default async function DashboardPage() {
             <span className="text-base font-bold text-slate-900">PresupuestoEC</span>
           </div>
           <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard/apus"
+              className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition-colors hidden sm:block"
+            >
+              <Calculator className="w-4 h-4" />
+              Biblioteca APU
+            </Link>
             <Link
               href="/dashboard/perfil"
               className="text-sm text-slate-500 hover:text-slate-700 transition-colors hidden sm:block"

@@ -15,6 +15,7 @@ import { Hash, User } from 'lucide-react'
 import EstadoSelector from '@/components/EstadoSelector'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import PlantillaButton from '@/components/PlantillaButton'
+import APUSelector from '@/components/APUSelector'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -235,6 +236,8 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           imprevistosInicial={Number(presupuesto.imprevistos_pct ?? 5)}
           utilidadInicial={Number(presupuesto.utilidad_pct ?? 10)}
         />
+
+        <APUSelector presupuestoId={presupuesto.id} />
 
         <ComparadorProveedores
           items={(items || []).map(item => ({
