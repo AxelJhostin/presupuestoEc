@@ -143,6 +143,62 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#1d4ed8',
   },
+  notasBox: {
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 4,
+    padding: 10,
+    marginTop: 12,
+  },
+  notasTitle: {
+    fontSize: 8,
+    color: '#64748b',
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  notasText: {
+    fontSize: 9,
+    color: '#334155',
+    lineHeight: 1.5,
+  },
+  resumenBox: {
+    marginTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#e2e8f0',
+    paddingTop: 10,
+  },
+  resumenRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 2,
+  },
+  resumenLabel: {
+    fontSize: 9,
+    color: '#64748b',
+  },
+  resumenValue: {
+    fontSize: 9,
+    color: '#334155',
+  },
+  resumenTotal: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 6,
+    marginTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: '#1d4ed8',
+  },
+  resumenTotalLabel: {
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: '#1e293b',
+  },
+  resumenTotalValue: {
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: '#1d4ed8',
+  },
   footer: {
     position: 'absolute',
     bottom: 30,
@@ -183,6 +239,10 @@ interface Props {
   cliente_nombre?: string
   cliente_telefono?: string
   cliente_ruc?: string
+  notas?: string
+  estado?: string
+  imprevistos_pct?: number
+  utilidad_pct?: number
 }
 
 export default function PresupuestoPDF({
@@ -196,6 +256,9 @@ export default function PresupuestoPDF({
   cliente_nombre,
   cliente_telefono,
   cliente_ruc,
+  notas,
+  imprevistos_pct = 5,
+  utilidad_pct = 10,
 }: Props) {
   const tieneCliente = cliente_nombre || cliente_telefono || cliente_ruc
 
@@ -292,6 +355,42 @@ export default function PresupuestoPDF({
           <Text style={styles.totalLabel}>TOTAL</Text>
           <Text style={styles.totalValue}>${Number(total).toFixed(2)}</Text>
         </View>
+
+        {/* Resumen financiero */}
+        {(imprevistos_pct > 0 || utilidad_pct > 0) && (
+          <View style={styles.resumenBox}>
+            <View style={styles.resumenRow}>
+              <Text style={styles.resumenLabel}>Subtotal materiales</Text>
+              <Text style={styles.resumenValue}>${Number(total).toFixed(2)}</Text>
+            </View>
+            {imprevistos_pct > 0 && (
+              <View style={styles.resumenRow}>
+                <Text style={styles.resumenLabel}>Imprevistos ({imprevistos_pct}%)</Text>
+                <Text style={styles.resumenValue}>+${(total * imprevistos_pct / 100).toFixed(2)}</Text>
+              </View>
+            )}
+            {utilidad_pct > 0 && (
+              <View style={styles.resumenRow}>
+                <Text style={styles.resumenLabel}>Utilidad ({utilidad_pct}%)</Text>
+                <Text style={styles.resumenValue}>+${(total * utilidad_pct / 100).toFixed(2)}</Text>
+              </View>
+            )}
+            <View style={styles.resumenTotal}>
+              <Text style={styles.resumenTotalLabel}>TOTAL FINAL</Text>
+              <Text style={styles.resumenTotalValue}>
+                ${(total * (1 + imprevistos_pct / 100 + utilidad_pct / 100)).toFixed(2)}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Notas */}
+        {notas && (
+          <View style={styles.notasBox}>
+            <Text style={styles.notasTitle}>Notas y observaciones</Text>
+            <Text style={styles.notasText}>{notas}</Text>
+          </View>
+        )}
 
         {/* Footer */}
         <Text style={styles.footer}>

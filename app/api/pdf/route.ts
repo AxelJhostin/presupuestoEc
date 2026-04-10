@@ -63,6 +63,10 @@ export async function GET(request: NextRequest) {
     cliente_nombre: presupuesto.cliente_nombre || undefined,
     cliente_telefono: presupuesto.cliente_telefono || undefined,
     cliente_ruc: presupuesto.cliente_ruc || undefined,
+    notas: presupuesto.notas || undefined,
+    estado: presupuesto.estado || 'borrador',
+    imprevistos_pct: presupuesto.imprevistos_pct ?? 5,
+    utilidad_pct: presupuesto.utilidad_pct ?? 10,
   }) as unknown as React.ReactElement<{ children?: React.ReactNode }>
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
