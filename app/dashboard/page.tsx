@@ -5,7 +5,7 @@ import { getUser } from '@/lib/getUser'
 import { Plus } from 'lucide-react'
 import LogoutButton from '@/components/LogoutButton'
 import StatsBar from '@/components/dashboard/StatsBar'
-import PresupuestoCard from '@/components/dashboard/PresupuestoCard'
+import FiltrosDashboard from '@/components/dashboard/FiltrosDashboard'
 import EmptyState from '@/components/dashboard/EmptyState'
 
 export default async function DashboardPage() {
@@ -62,11 +62,7 @@ export default async function DashboardPage() {
         {lista.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="space-y-2">
-            {lista.map(p => (
-              <PresupuestoCard key={p.id} p={p} />
-            ))}
-          </div>
+          <FiltrosDashboard presupuestos={lista} />
         )}
       </main>
     </div>
