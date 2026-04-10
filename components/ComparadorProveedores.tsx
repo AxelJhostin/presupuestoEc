@@ -50,6 +50,7 @@ export default function ComparadorProveedores({ items, presupuestoId }: Props) {
       if (data) setProveedoresGuardados(data)
     }
     if (mostrar) cargarProveedores()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mostrar])
 
   // Cargar cotizaciones guardadas si hay presupuestoId
@@ -86,6 +87,7 @@ export default function ComparadorProveedores({ items, presupuestoId }: Props) {
       setCotizaciones(nuevasCotizaciones)
     }
     if (mostrar) cargarCotizaciones()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mostrar, presupuestoId])
 
   function agregarProveedor() {

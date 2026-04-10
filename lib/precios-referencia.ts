@@ -97,4 +97,4 @@ export const PRECIOS_REFERENCIA: PrecioReferencia[] = [
   { categoria: 'Mano de obra', descripcion: 'Plomero / gasfitero (jornal 8h)', unidad: 'día', precio_min: 22.00, precio_max: 35.00, precio_referencia: 28.00 },
 ]
 
-export const CATEGORIAS_PRECIOS = [...new Set(PRECIOS_REFERENCIA.map(p => p.categoria))]
+export const CATEGORIAS_PRECIOS = Array.from(new Set(PRECIOS_REFERENCIA.map(p => p.categoria)))

@@ -44,6 +44,7 @@ export default function APUSelector({ presupuestoId }: Props) {
     if (mostrar) {
       cargarDatos()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mostrar])
 
   async function cargarDatos() {
