@@ -16,6 +16,7 @@ import EstadoSelector from '@/components/EstadoSelector'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import PlantillaButton from '@/components/PlantillaButton'
 import APUSelector from '@/components/APUSelector'
+import PreciosReferencia from '@/components/PreciosReferencia'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -248,6 +249,8 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           }))}
           presupuestoId={presupuesto.id}
         />
+
+        <PreciosReferencia />
 
         <NotasPresupuesto
           presupuestoId={presupuesto.id}
