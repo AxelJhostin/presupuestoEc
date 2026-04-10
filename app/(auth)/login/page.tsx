@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { CheckCircle2, Calculator, FileDown, Zap } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -37,48 +38,61 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-50 flex">
 
       {/* Panel izquierdo — branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-blue-600 flex-col justify-between p-12">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 flex-col justify-between p-12">
         <div>
           <div className="flex items-center gap-3 mb-16">
-            <div className="w-9 h-9 bg-white rounded-md flex items-center justify-center">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
               <span className="text-blue-600 text-sm font-bold">P</span>
             </div>
-            <span className="text-white text-lg font-bold">PresupuestoEC</span>
+            <span className="text-white text-xl font-bold">PresupuestoEC</span>
           </div>
+
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
             Presupuestos de obra profesionales en minutos
           </h1>
-          <p className="text-blue-200 text-lg">
-            Cálculos automáticos según la NEC. Para ingenieros independientes en Ecuador.
+          <p className="text-blue-200 text-lg leading-relaxed">
+            Cálculos automáticos según la NEC. Para ingenieros, maestros de obra y técnicos independientes en Ecuador.
           </p>
         </div>
 
+        {/* Features */}
         <div className="space-y-4">
           {[
-            { num: '6', label: 'Elementos constructivos' },
-            { num: 'NEC', label: 'Norma Ecuatoriana de la Construcción' },
-            { num: 'PDF', label: 'Exportación profesional' },
-          ].map(item => (
-            <div key={item.num} className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-blue-500 rounded-md flex items-center justify-center shrink-0">
-                <span className="text-white text-xs font-bold">{item.num}</span>
+            { icon: <Calculator className="w-4 h-4 text-blue-300" />, label: '6 elementos NEC — losa, columna, pintura, mampostería, cerámica, contrapiso' },
+            { icon: <FileDown className="w-4 h-4 text-blue-300" />, label: 'Exporta PDF y Excel profesional con tus datos de ingeniero' },
+            { icon: <Zap className="w-4 h-4 text-blue-300" />, label: 'APU, comparador de proveedores, precios de referencia Manabí' },
+            { icon: <CheckCircle2 className="w-4 h-4 text-blue-300" />, label: 'Gratis para siempre — sin límite de presupuestos' },
+          ].map((item, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-blue-500/40 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                {item.icon}
               </div>
-              <span className="text-blue-100 text-sm">{item.label}</span>
+              <span className="text-blue-100 text-sm leading-relaxed">{item.label}</span>
             </div>
           ))}
+        </div>
+
+        {/* Footer branding */}
+        <div className="pt-8 border-t border-blue-500/30">
+          <p className="text-blue-300 text-xs">
+            Hecho para el mercado ecuatoriano · Precios de referencia Manabí · Norma NEC
+          </p>
         </div>
       </div>
 
       {/* Panel derecho — formulario */}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm">
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-8 lg:hidden">
-              <div className="w-7 h-7 bg-blue-600 rounded-md flex items-center justify-center">
-                <span className="text-white text-xs font-bold">P</span>
-              </div>
-              <span className="text-slate-900 font-bold">PresupuestoEC</span>
+
+          {/* Logo móvil */}
+          <div className="flex items-center gap-2 mb-8 lg:hidden">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white text-xs font-bold">P</span>
             </div>
+            <span className="text-slate-900 font-bold text-lg">PresupuestoEC</span>
+          </div>
+
+          <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-900">Bienvenido de vuelta</h2>
             <p className="text-slate-500 text-sm mt-1">Ingresa a tu cuenta para continuar</p>
           </div>
@@ -110,7 +124,7 @@ export default function LoginPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
               {loading ? 'Ingresando...' : 'Ingresar'}
             </Button>
           </form>
@@ -120,6 +134,10 @@ export default function LoginPage() {
             <Link href="/register" className="text-blue-600 hover:underline font-medium">
               Regístrate gratis
             </Link>
+          </p>
+
+          <p className="text-center text-xs text-slate-400 mt-8">
+            Sin tarjeta de crédito · Sin límite de presupuestos
           </p>
         </div>
       </div>
