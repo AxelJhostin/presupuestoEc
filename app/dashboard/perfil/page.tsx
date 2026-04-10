@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ArrowLeft, User, Building2, Phone, Mail, Save } from 'lucide-react'
 
 function validarTelefono(tel: string): boolean {
   if (!tel) return true
@@ -48,8 +49,8 @@ export default function PerfilPage() {
       setLoading(false)
     }
     cargarPerfil()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleGuardar(e: React.FormEvent) {
     e.preventDefault()
@@ -65,7 +66,7 @@ export default function PerfilPage() {
     }
 
     if (telefono && !validarTelefono(telefono)) {
-      toast.error('Teléfono inválido. Ingresa 10 dígitos (ej: 0999123456) o con código de país (ej: 593999123456).')
+      toast.error('Teléfono inválido. Ingresa 10 dígitos (ej: 0999123456).')
       return
     }
 
@@ -98,63 +99,152 @@ export default function PerfilPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center gap-4">
-        <Link href="/dashboard" className="text-slate-400 hover:text-slate-600 text-sm">
-          ← Dashboard
-        </Link>
-        <h1 className="text-lg font-semibold text-slate-900">Mi perfil</h1>
+
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-3">
+          <Link href="/dashboard" className="text-slate-400 hover:text-slate-600 transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div className="w-px h-4 bg-slate-200" />
+          <div>
+            <h1 className="text-base font-semibold text-slate-900">Mi perfil</h1>
+            <p className="text-xs text-slate-400">Tus datos aparecerán en el encabezado del PDF</p>
+          </div>
+        </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-6 py-10">
-        <div className="bg-white border border-slate-200 rounded-lg p-6">
-          <p className="text-sm text-slate-500 mb-6">
-            Estos datos aparecerán en el PDF de tus presupuestos.
-          </p>
+      {/* Banner */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700">
+        <div className="max-w-7xl mx-auto px-6 py-8 flex items-center gap-5">
+          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+            <User className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <p className="text-white font-bold text-xl">
+              {nombre || 'Tu nombre aquí'}
+            </p>
+            <p className="text-blue-200 text-sm mt-0.5">
+              {empresa || 'Sin empresa registrada'} · {email}
+            </p>
+          </div>
+        </div>
+      </div>
 
-          <form onSubmit={handleGuardar} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label>Correo electrónico</Label>
-              <Input value={email} disabled className="bg-slate-50 text-slate-400" />
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+          {/* Formulario */}
+          <div className="xl:col-span-2">
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100">
+                <h2 className="font-semibold text-slate-900">Información personal</h2>
+                <p className="text-xs text-slate-400 mt-0.5">Estos datos aparecen en el PDF de tus presupuestos</p>
+              </div>
+
+              <form onSubmit={handleGuardar} className="p-6 space-y-5">
+
+                {/* Email */}
+                <div className="space-y-1.5">
+                  <Label className="flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-slate-400" />
+                    Correo electrónico
+                  </Label>
+                  <Input value={email} disabled className="bg-slate-50 text-slate-400" />
+                  <p className="text-xs text-slate-400">El correo no se puede cambiar.</p>
+                </div>
+
+                {/* Nombre */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="nombre" className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-slate-400" />
+                    Nombre completo
+                  </Label>
+                  <Input
+                    id="nombre"
+                    placeholder="Ing. Juan Pérez"
+                    value={nombre}
+                    onChange={e => setNombre(e.target.value)}
+                    maxLength={80}
+                  />
+                </div>
+
+                {/* Teléfono */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="telefono" className="flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-slate-400" />
+                    Teléfono
+                  </Label>
+                  <Input
+                    id="telefono"
+                    placeholder="0999 123 456"
+                    value={telefono}
+                    onChange={e => setTelefono(e.target.value)}
+                    maxLength={15}
+                  />
+                  <p className="text-xs text-slate-400">10 dígitos (ej: 0999123456) o con código de país (ej: 593999123456)</p>
+                </div>
+
+                {/* Empresa */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="empresa" className="flex items-center gap-1.5">
+                    <Building2 className="w-3.5 h-3.5 text-slate-400" />
+                    Empresa / Estudio (opcional)
+                  </Label>
+                  <Input
+                    id="empresa"
+                    placeholder="Constructora Pérez"
+                    value={empresa}
+                    onChange={e => setEmpresa(e.target.value)}
+                    maxLength={100}
+                  />
+                </div>
+
+                <Button type="submit" className="w-full flex items-center gap-2" disabled={guardando}>
+                  <Save className="w-4 h-4" />
+                  {guardando ? 'Guardando...' : 'Guardar perfil'}
+                </Button>
+              </form>
             </div>
+          </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="nombre">Nombre completo</Label>
-              <Input
-                id="nombre"
-                placeholder="Ing. Juan Pérez"
-                value={nombre}
-                onChange={e => setNombre(e.target.value)}
-                maxLength={80}
-              />
+          {/* Panel lateral — preview PDF */}
+          <div className="xl:col-span-1">
+            <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100">
+                <h3 className="font-semibold text-slate-900 text-sm">Vista previa en PDF</h3>
+                <p className="text-xs text-slate-400 mt-0.5">Así aparecerás en el encabezado</p>
+              </div>
+              <div className="p-6">
+                {/* Simulación del header del PDF */}
+                <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                  <div className="flex items-start justify-between pb-3 border-b-2 border-blue-600">
+                    <div>
+                      <p className="text-blue-600 font-bold text-lg">PresupuestoEC</p>
+                      <p className="text-slate-400 text-xs mt-0.5">Generador de presupuestos de obra — Ecuador</p>
+                    </div>
+                    {(nombre || empresa) && (
+                      <div className="text-right">
+                        {nombre && <p className="text-slate-800 font-semibold text-xs">{nombre}</p>}
+                        {empresa && <p className="text-slate-500 text-xs mt-0.5">{empresa}</p>}
+                        {telefono && <p className="text-slate-500 text-xs mt-0.5">{telefono}</p>}
+                        {email && <p className="text-slate-500 text-xs mt-0.5">{email}</p>}
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-3 space-y-1">
+                    <div className="h-2 bg-slate-200 rounded w-3/4" />
+                    <div className="h-2 bg-slate-200 rounded w-1/2" />
+                    <div className="h-2 bg-slate-200 rounded w-2/3" />
+                  </div>
+                </div>
+                <p className="text-xs text-slate-400 mt-3 text-center">
+                  La vista previa se actualiza en tiempo real
+                </p>
+              </div>
             </div>
+          </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="telefono">Teléfono</Label>
-              <Input
-                id="telefono"
-                placeholder="0999 123 456"
-                value={telefono}
-                onChange={e => setTelefono(e.target.value)}
-                maxLength={15}
-              />
-              <p className="text-xs text-slate-400">10 dígitos (ej: 0999123456) o con código de país (ej: 593999123456)</p>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="empresa">Empresa / Estudio (opcional)</Label>
-              <Input
-                id="empresa"
-                placeholder="Constructora Pérez"
-                value={empresa}
-                onChange={e => setEmpresa(e.target.value)}
-                maxLength={100}
-              />
-            </div>
-
-            <Button type="submit" className="w-full" disabled={guardando}>
-              {guardando ? 'Guardando...' : 'Guardar perfil'}
-            </Button>
-          </form>
         </div>
       </main>
     </div>

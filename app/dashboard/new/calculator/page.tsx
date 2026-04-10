@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2, ArrowLeft, Save } from 'lucide-react'
 import { calcularLosa, losaAItems } from '@/lib/formulas/losa'
 import { calcularColumna, columnaAItems } from '@/lib/formulas/columna'
 import { calcularPintura, pinturaAItems } from '@/lib/formulas/pintura'
@@ -39,6 +39,15 @@ const ETIQUETAS: Record<Elemento, string> = {
   mamposteria: 'Mampostería',
   ceramica: 'Cerámica',
   contrapiso: 'Contrapiso',
+}
+
+const ELEMENTO_INFO: Record<Elemento, { descripcion: string; color: string }> = {
+  losa: { descripcion: 'Calcula cemento, acero, arena, ripio y encofrado para losa maciza', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  columna: { descripcion: 'Calcula materiales para columna rectangular de hormigón armado', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  pintura: { descripcion: 'Calcula galones de pintura, empaste y lija por área de pared', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+  mamposteria: { descripcion: 'Calcula bloques, mortero y acero para mampostería de bloque', color: 'bg-green-50 text-green-700 border-green-200' },
+  ceramica: { descripcion: 'Calcula cerámica, bondex y fragua según tamaño de pieza', color: 'bg-orange-50 text-orange-700 border-orange-200' },
+  contrapiso: { descripcion: 'Calcula materiales para contrapiso con malla electrosoldada', color: 'bg-slate-50 text-slate-700 border-slate-200' },
 }
 
 export default function CalculatorPage() {
@@ -196,179 +205,232 @@ export default function CalculatorPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center gap-4">
-        <Link href="/dashboard/new" className="text-slate-400 hover:text-slate-600 text-sm">← Volver</Link>
-        <h1 className="text-lg font-semibold text-slate-900">Modo Calculadora</h1>
-      </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-10 space-y-8">
-
-        {/* Nombre */}
-        <div className="space-y-1.5">
-          <Label htmlFor="nombre">Nombre del proyecto</Label>
-          <Input
-            id="nombre"
-            placeholder="Ej: Casa Sr. Pérez — Obra completa"
-            value={nombre}
-            onChange={e => setNombre(e.target.value)}
-          />
-        </div>
-
-        {/* Cliente */}
-        <ClienteForm value={cliente} onChange={setCliente} />
-
-        {/* Selector */}
-        <div className="space-y-3">
-          <Label>Elemento constructivo</Label>
-          <Tabs value={elemento} onValueChange={v => setElemento(v as Elemento)}>
-            <TabsList className="w-full flex-wrap h-auto">
-              <TabsTrigger value="losa" className="flex-1">Losa</TabsTrigger>
-              <TabsTrigger value="columna" className="flex-1">Columna</TabsTrigger>
-              <TabsTrigger value="pintura" className="flex-1">Pintura</TabsTrigger>
-              <TabsTrigger value="mamposteria" className="flex-1">Mampostería</TabsTrigger>
-              <TabsTrigger value="ceramica" className="flex-1">Cerámica</TabsTrigger>
-              <TabsTrigger value="contrapiso" className="flex-1">Contrapiso</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Formulario */}
-        <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-4">
-          {elemento === 'losa' && (
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={losaLargo} onChange={e => setLosaLargo(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Ancho (m)</Label><Input type="number" placeholder="4.00" value={losaAncho} onChange={e => setLosaAncho(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Espesor (m)</Label><Input type="number" placeholder="0.20" value={losaEspesor} onChange={e => setLosaEspesor(e.target.value)} /></div>
-            </div>
-          )}
-          {elemento === 'columna' && (
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-1.5"><Label>Ancho (m)</Label><Input type="number" placeholder="0.30" value={colAncho} onChange={e => setColAncho(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Profundidad (m)</Label><Input type="number" placeholder="0.30" value={colProfundidad} onChange={e => setColProfundidad(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Altura (m)</Label><Input type="number" placeholder="3.00" value={colAltura} onChange={e => setColAltura(e.target.value)} /></div>
-            </div>
-          )}
-          {elemento === 'pintura' && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={pintLargo} onChange={e => setPintLargo(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Alto (m)</Label><Input type="number" placeholder="2.80" value={pintAlto} onChange={e => setPintAlto(e.target.value)} /></div>
-              <div className="space-y-1.5">
-                <Label>Número de manos</Label>
-                <select className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" value={pintManos} onChange={e => setPintManos(parseInt(e.target.value) as 1|2|3)}>
-                  <option value={1}>1 mano</option>
-                  <option value={2}>2 manos</option>
-                  <option value={3}>3 manos</option>
-                </select>
-              </div>
-              <div className="space-y-1.5"><Label>Vanos a descontar (m²)</Label><Input type="number" placeholder="0" value={pintVanos} onChange={e => setPintVanos(e.target.value)} /></div>
-            </div>
-          )}
-          {elemento === 'mamposteria' && (
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={mampLargo} onChange={e => setMampLargo(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Alto (m)</Label><Input type="number" placeholder="2.80" value={mampAlto} onChange={e => setMampAlto(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Vanos a descontar (m²)</Label><Input type="number" placeholder="0" value={mampVanos} onChange={e => setMampVanos(e.target.value)} /></div>
-            </div>
-          )}
-          {elemento === 'ceramica' && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={cerLargo} onChange={e => setCerLargo(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Ancho (m)</Label><Input type="number" placeholder="4.00" value={cerAncho} onChange={e => setCerAncho(e.target.value)} /></div>
-              <div className="space-y-1.5">
-                <Label>Tamaño de cerámica</Label>
-                <select className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" value={cerTamano} onChange={e => setCerTamano(e.target.value as '20x20'|'30x30'|'40x40'|'60x60')}>
-                  <option value="20x20">20x20 cm</option>
-                  <option value="30x30">30x30 cm</option>
-                  <option value="40x40">40x40 cm</option>
-                  <option value="60x60">60x60 cm</option>
-                </select>
-              </div>
-              <div className="space-y-1.5"><Label>Vanos a descontar (m²)</Label><Input type="number" placeholder="0" value={cerVanos} onChange={e => setCerVanos(e.target.value)} /></div>
-            </div>
-          )}
-          {elemento === 'contrapiso' && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5"><Label>Largo (m)</Label><Input type="number" placeholder="5.00" value={ctrLargo} onChange={e => setCtrLargo(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Ancho (m)</Label><Input type="number" placeholder="4.00" value={ctrAncho} onChange={e => setCtrAncho(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Espesor (m)</Label><Input type="number" placeholder="0.08" value={ctrEspesor} onChange={e => setCtrEspesor(e.target.value)} /></div>
-              <div className="space-y-1.5 flex items-end">
-                <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
-                  <input type="checkbox" checked={ctrMalla} onChange={e => setCtrMalla(e.target.checked)} className="rounded" />
-                  Incluir malla electrosoldada R-84
-                </label>
-              </div>
-            </div>
-          )}
-
-          <Button onClick={handleCalcular} className="w-full">
-            <Plus className="w-4 h-4 mr-2" />
-            Calcular y agregar al presupuesto
-          </Button>
-        </div>
-
-        {/* Items acumulados agrupados por elemento */}
-        {itemsAcumulados.length > 0 && (
-          <div className="bg-white border border-slate-200 rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="font-semibold text-slate-900">Materiales acumulados</h3>
-              <span className="text-xs text-slate-400">{itemsAcumulados.length} items</span>
-            </div>
-
-            {Array.from(new Set(itemsAcumulados.map(i => i.etiqueta))).map(etiqueta => {
-              const grupo = itemsAcumulados.filter(i => i.etiqueta === etiqueta)
-              return (
-                <div key={etiqueta}>
-                  <div className="px-6 py-2 bg-blue-50 border-b border-slate-100 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-blue-700 uppercase tracking-wide">{etiqueta}</span>
-                    <button
-                      onClick={() => setItemsAcumulados(prev => prev.filter(i => i.etiqueta !== etiqueta))}
-                      className="text-xs text-slate-400 hover:text-red-400 transition-colors flex items-center gap-1"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      Quitar sección
-                    </button>
-                  </div>
-                  <TablaItems
-                    items={grupo.map(i => ({ id: i.tempId, descripcion: i.descripcion, unidad: i.unidad, cantidad: i.cantidad, precio_unitario: i.precio_unitario }))}
-                    onPrecioChange={handlePrecioChange}
-                    onEliminar={eliminarItem}
-                    total={grupo.reduce((acc, i) => acc + i.cantidad * i.precio_unitario, 0)}
-                  />
-                </div>
-              )
-            })}
-
-            <div className="px-6 py-4 bg-slate-50 border-t-2 border-blue-600 flex items-center justify-between">
-              <span className="font-bold text-slate-900">TOTAL GENERAL</span>
-              <span className="font-bold text-blue-600 text-xl">${total.toFixed(2)}</span>
+      {/* Header */}
+      <header className="bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard/new" className="text-slate-400 hover:text-slate-600 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+            </Link>
+            <div className="w-px h-4 bg-slate-200" />
+            <div>
+              <h1 className="text-base font-semibold text-slate-900">Modo Calculadora NEC</h1>
+              <p className="text-xs text-slate-400">Cálculo automático de materiales según normativa ecuatoriana</p>
             </div>
           </div>
-        )}
+          {itemsAcumulados.length > 0 && (
+            <Button onClick={handleGuardar} disabled={loading} className="flex items-center gap-2">
+              <Save className="w-4 h-4" />
+              {loading ? 'Guardando...' : 'Guardar presupuesto'}
+            </Button>
+          )}
+        </div>
+      </header>
 
-        {/* Secciones */}
-        {itemsParaComponentes.length > 0 && (
-          <SeccionesPresupuesto items={itemsParaComponentes} />
-        )}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-        {/* Comparador */}
-        {itemsParaComponentes.length > 0 && (
-          <ComparadorProveedores
-            items={itemsParaComponentes.map(i => ({
-              id: i.id,
-              descripcion: i.descripcion,
-              unidad: i.unidad,
-              cantidad: i.cantidad,
-            }))}
-          />
-        )}
+          {/* Columna izquierda — formulario */}
+          <div className="xl:col-span-1 space-y-5">
 
-        {/* Guardar */}
-        {itemsAcumulados.length > 0 && (
-          <Button onClick={handleGuardar} disabled={loading} className="w-full" size="lg">
-            {loading ? 'Guardando...' : 'Guardar presupuesto completo'}
-          </Button>
-        )}
+            {/* Nombre del proyecto */}
+            <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+              <h2 className="font-semibold text-slate-900 text-sm uppercase tracking-wide">Datos del proyecto</h2>
+              <div className="space-y-1.5">
+                <Label htmlFor="nombre">Nombre del proyecto</Label>
+                <Input
+                  id="nombre"
+                  placeholder="Ej: Casa Sr. Pérez — Obra completa"
+                  value={nombre}
+                  onChange={e => setNombre(e.target.value)}
+                />
+              </div>
+            </div>
 
+            {/* Cliente */}
+            <ClienteForm value={cliente} onChange={setCliente} />
+
+            {/* Selector de elemento */}
+            <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
+              <h2 className="font-semibold text-slate-900 text-sm uppercase tracking-wide">Elemento constructivo</h2>
+              <Tabs value={elemento} onValueChange={v => setElemento(v as Elemento)}>
+                <TabsList className="w-full grid grid-cols-3 h-auto gap-1">
+                  <TabsTrigger value="losa" className="text-xs py-2">Losa</TabsTrigger>
+                  <TabsTrigger value="columna" className="text-xs py-2">Columna</TabsTrigger>
+                  <TabsTrigger value="pintura" className="text-xs py-2">Pintura</TabsTrigger>
+                  <TabsTrigger value="mamposteria" className="text-xs py-2">Mampostería</TabsTrigger>
+                  <TabsTrigger value="ceramica" className="text-xs py-2">Cerámica</TabsTrigger>
+                  <TabsTrigger value="contrapiso" className="text-xs py-2">Contrapiso</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              {/* Info del elemento */}
+              <div className={`text-xs px-3 py-2 rounded-lg border ${ELEMENTO_INFO[elemento].color}`}>
+                {ELEMENTO_INFO[elemento].descripcion}
+              </div>
+
+              {/* Formulario de medidas */}
+              <div className="space-y-3">
+                {elemento === 'losa' && (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1"><Label className="text-xs">Largo (m)</Label><Input type="number" placeholder="5.00" value={losaLargo} onChange={e => setLosaLargo(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Ancho (m)</Label><Input type="number" placeholder="4.00" value={losaAncho} onChange={e => setLosaAncho(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Espesor (m)</Label><Input type="number" placeholder="0.20" value={losaEspesor} onChange={e => setLosaEspesor(e.target.value)} /></div>
+                  </div>
+                )}
+                {elemento === 'columna' && (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1"><Label className="text-xs">Ancho (m)</Label><Input type="number" placeholder="0.30" value={colAncho} onChange={e => setColAncho(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Profundidad (m)</Label><Input type="number" placeholder="0.30" value={colProfundidad} onChange={e => setColProfundidad(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Altura (m)</Label><Input type="number" placeholder="3.00" value={colAltura} onChange={e => setColAltura(e.target.value)} /></div>
+                  </div>
+                )}
+                {elemento === 'pintura' && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1"><Label className="text-xs">Largo (m)</Label><Input type="number" placeholder="5.00" value={pintLargo} onChange={e => setPintLargo(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Alto (m)</Label><Input type="number" placeholder="2.80" value={pintAlto} onChange={e => setPintAlto(e.target.value)} /></div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Manos</Label>
+                      <select className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" value={pintManos} onChange={e => setPintManos(parseInt(e.target.value) as 1|2|3)}>
+                        <option value={1}>1 mano</option>
+                        <option value={2}>2 manos</option>
+                        <option value={3}>3 manos</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1"><Label className="text-xs">Vanos (m²)</Label><Input type="number" placeholder="0" value={pintVanos} onChange={e => setPintVanos(e.target.value)} /></div>
+                  </div>
+                )}
+                {elemento === 'mamposteria' && (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="space-y-1"><Label className="text-xs">Largo (m)</Label><Input type="number" placeholder="5.00" value={mampLargo} onChange={e => setMampLargo(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Alto (m)</Label><Input type="number" placeholder="2.80" value={mampAlto} onChange={e => setMampAlto(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Vanos (m²)</Label><Input type="number" placeholder="0" value={mampVanos} onChange={e => setMampVanos(e.target.value)} /></div>
+                  </div>
+                )}
+                {elemento === 'ceramica' && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1"><Label className="text-xs">Largo (m)</Label><Input type="number" placeholder="5.00" value={cerLargo} onChange={e => setCerLargo(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Ancho (m)</Label><Input type="number" placeholder="4.00" value={cerAncho} onChange={e => setCerAncho(e.target.value)} /></div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Tamaño</Label>
+                      <select className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm" value={cerTamano} onChange={e => setCerTamano(e.target.value as '20x20'|'30x30'|'40x40'|'60x60')}>
+                        <option value="20x20">20x20 cm</option>
+                        <option value="30x30">30x30 cm</option>
+                        <option value="40x40">40x40 cm</option>
+                        <option value="60x60">60x60 cm</option>
+                      </select>
+                    </div>
+                    <div className="space-y-1"><Label className="text-xs">Vanos (m²)</Label><Input type="number" placeholder="0" value={cerVanos} onChange={e => setCerVanos(e.target.value)} /></div>
+                  </div>
+                )}
+                {elemento === 'contrapiso' && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1"><Label className="text-xs">Largo (m)</Label><Input type="number" placeholder="5.00" value={ctrLargo} onChange={e => setCtrLargo(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Ancho (m)</Label><Input type="number" placeholder="4.00" value={ctrAncho} onChange={e => setCtrAncho(e.target.value)} /></div>
+                    <div className="space-y-1"><Label className="text-xs">Espesor (m)</Label><Input type="number" placeholder="0.08" value={ctrEspesor} onChange={e => setCtrEspesor(e.target.value)} /></div>
+                    <div className="flex items-end pb-1">
+                      <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer">
+                        <input type="checkbox" checked={ctrMalla} onChange={e => setCtrMalla(e.target.checked)} className="rounded" />
+                        Malla electrosoldada R-84
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                <Button onClick={handleCalcular} className="w-full">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Calcular y agregar
+                </Button>
+              </div>
+            </div>
+
+            {/* Total flotante */}
+            {itemsAcumulados.length > 0 && (
+              <div className="bg-blue-600 text-white rounded-xl px-6 py-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-blue-200 uppercase tracking-wide">Total acumulado</p>
+                  <p className="text-2xl font-bold">${total.toFixed(2)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-blue-200">{itemsAcumulados.length} materiales</p>
+                  <p className="text-xs text-blue-200 mt-0.5">
+                    {Array.from(new Set(itemsAcumulados.map(i => i.etiqueta))).length} elementos
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Columna derecha — resultados */}
+          <div className="xl:col-span-2 space-y-6">
+
+            {itemsAcumulados.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-xl px-6 py-16 text-center">
+                <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Plus className="w-8 h-8 text-blue-400" />
+                </div>
+                <p className="font-medium text-slate-700 mb-1">Aquí aparecerán los materiales calculados</p>
+                <p className="text-sm text-slate-400">Selecciona un elemento, ingresa las medidas y presiona Calcular y agregar</p>
+              </div>
+            ) : (
+              <>
+                {/* Items acumulados */}
+                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden">
+                  <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <h3 className="font-semibold text-slate-900">Materiales acumulados</h3>
+                    <span className="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">{itemsAcumulados.length} items</span>
+                  </div>
+
+                  {Array.from(new Set(itemsAcumulados.map(i => i.etiqueta))).map(etiqueta => {
+                    const grupo = itemsAcumulados.filter(i => i.etiqueta === etiqueta)
+                    return (
+                      <div key={etiqueta}>
+                        <div className="px-6 py-2 bg-blue-50 border-b border-slate-100 flex items-center justify-between">
+                          <span className="text-xs font-semibold text-blue-700 uppercase tracking-wide">{etiqueta}</span>
+                          <button
+                            onClick={() => setItemsAcumulados(prev => prev.filter(i => i.etiqueta !== etiqueta))}
+                            className="text-xs text-slate-400 hover:text-red-400 transition-colors flex items-center gap-1"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Quitar
+                          </button>
+                        </div>
+                        <TablaItems
+                          items={grupo.map(i => ({ id: i.tempId, descripcion: i.descripcion, unidad: i.unidad, cantidad: i.cantidad, precio_unitario: i.precio_unitario }))}
+                          onPrecioChange={handlePrecioChange}
+                          onEliminar={eliminarItem}
+                          total={grupo.reduce((acc, i) => acc + i.cantidad * i.precio_unitario, 0)}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+
+                {/* Secciones */}
+                <SeccionesPresupuesto items={itemsParaComponentes} />
+
+                {/* Comparador */}
+                <ComparadorProveedores
+                  items={itemsParaComponentes.map(i => ({
+                    id: i.id,
+                    descripcion: i.descripcion,
+                    unidad: i.unidad,
+                    cantidad: i.cantidad,
+                  }))}
+                />
+
+                {/* Botón guardar móvil */}
+                <div className="xl:hidden">
+                  <Button onClick={handleGuardar} disabled={loading} className="w-full" size="lg">
+                    <Save className="w-4 h-4 mr-2" />
+                    {loading ? 'Guardando...' : 'Guardar presupuesto completo'}
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </main>
     </div>
   )
