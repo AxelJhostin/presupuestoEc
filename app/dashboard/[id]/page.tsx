@@ -13,7 +13,7 @@ import ExcelButton from '@/components/ExcelButton'
 import SeccionesPresupuesto from '@/components/SeccionesPresupuesto'
 import { Hash, User } from 'lucide-react'
 import EstadoSelector from '@/components/EstadoSelector'
-
+import WhatsAppButton from '@/components/WhatsAppButton'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -90,6 +90,15 @@ export default async function PresupuestoPage({ params }: { params: { id: string
                 precio_unitario: Number(item.precio_unitario),
                 subtotal: Number(item.subtotal),
               }))}
+            />
+            <WhatsAppButton
+              nombre={presupuesto.nombre}
+              numero={presupuesto.numero}
+              total={Number(presupuesto.total)}
+              imprevistos_pct={Number(presupuesto.imprevistos_pct ?? 5)}
+              utilidad_pct={Number(presupuesto.utilidad_pct ?? 10)}
+              cliente_nombre={presupuesto.cliente_nombre || undefined}
+              presupuestoId={presupuesto.id}
             />
             <DuplicarButton id={presupuesto.id} />
             <DeleteButton id={presupuesto.id} />
