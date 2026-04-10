@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 const ESTADOS = [
   { value: 'borrador', label: 'Borrador', color: 'bg-slate-100 text-slate-500' },
@@ -18,6 +19,7 @@ interface Props {
 
 export default function EstadoSelector({ presupuestoId, estadoInicial }: Props) {
   const supabase = createClient()
+  const router = useRouter()
   const [estado, setEstado] = useState(estadoInicial || 'borrador')
   const [guardando, setGuardando] = useState(false)
 
@@ -37,6 +39,7 @@ export default function EstadoSelector({ presupuestoId, estadoInicial }: Props) 
       setEstado(estado)
     } else {
       toast.success('Estado actualizado.')
+      router.refresh()
     }
     setGuardando(false)
   }
