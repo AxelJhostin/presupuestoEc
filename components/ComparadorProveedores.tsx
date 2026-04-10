@@ -53,6 +53,7 @@ export default function ComparadorProveedores({ items, presupuestoId }: Props) {
   }, [mostrar])
 
   // Cargar cotizaciones guardadas si hay presupuestoId
+ // Cargar cotizaciones guardadas si hay presupuestoId
   useEffect(() => {
     async function cargarCotizaciones() {
       if (!presupuestoId) return
@@ -61,6 +62,8 @@ export default function ComparadorProveedores({ items, presupuestoId }: Props) {
         .from('cotizaciones')
         .select('*, proveedores(id, nombre, telefono)')
         .eq('presupuesto_id', presupuestoId)
+
+      console.log('cotizaciones cargadas:', data)
 
       if (!data || data.length === 0) return
 
