@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getUser } from '@/lib/getUser'
 import { Calculator, FileText, ArrowLeft, Zap, PenLine } from 'lucide-react'
+import PlantillasSelector from '@/components/PlantillasSelector'
 
 export default async function NewPresupuestoPage() {
   const user = getUser()
@@ -93,6 +94,11 @@ export default async function NewPresupuestoPage() {
               <ArrowLeft className="w-4 h-4 rotate-180" />
             </div>
           </Link>
+        </div>
+
+        {/* Plantillas guardadas */}
+        <div className="mt-10">
+          <PlantillasSelector />
         </div>
       </main>
     </div>

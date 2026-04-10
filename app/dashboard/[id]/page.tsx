@@ -14,6 +14,7 @@ import SeccionesPresupuesto from '@/components/SeccionesPresupuesto'
 import { Hash, User } from 'lucide-react'
 import EstadoSelector from '@/components/EstadoSelector'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import PlantillaButton from '@/components/PlantillaButton'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -99,6 +100,10 @@ export default async function PresupuestoPage({ params }: { params: { id: string
               utilidad_pct={Number(presupuesto.utilidad_pct ?? 10)}
               cliente_nombre={presupuesto.cliente_nombre || undefined}
               presupuestoId={presupuesto.id}
+            />
+            <PlantillaButton
+              presupuestoId={presupuesto.id}
+              nombrePresupuesto={presupuesto.nombre}
             />
             <DuplicarButton id={presupuesto.id} />
             <DeleteButton id={presupuesto.id} />
