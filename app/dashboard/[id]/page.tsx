@@ -12,6 +12,7 @@ import ComparadorProveedores from '@/components/ComparadorProveedores'
 import ExcelButton from '@/components/ExcelButton'
 import SeccionesPresupuesto from '@/components/SeccionesPresupuesto'
 import { Hash, User } from 'lucide-react'
+import EstadoSelector from '@/components/EstadoSelector'
 
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
@@ -138,9 +139,15 @@ export default async function PresupuestoPage({ params }: { params: { id: string
               )}
             </div>
           )}
-          <div className="ml-auto">
-            <span className="text-slate-500 text-sm">Total: </span>
-            <span className="text-xl font-bold text-slate-900">${Number(presupuesto.total).toFixed(2)}</span>
+          <div className="ml-auto flex items-center gap-4">
+            <EstadoSelector
+              presupuestoId={presupuesto.id}
+              estadoInicial={presupuesto.estado || 'borrador'}
+            />
+            <div>
+              <span className="text-slate-500 text-sm">Total: </span>
+              <span className="text-xl font-bold text-slate-900">${Number(presupuesto.total).toFixed(2)}</span>
+            </div>
           </div>
         </div>
 
