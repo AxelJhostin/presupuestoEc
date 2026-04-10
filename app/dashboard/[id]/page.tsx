@@ -10,6 +10,7 @@ import NotasPresupuesto from '@/components/NotasPresupuesto'
 import ResumenFinanciero from '@/components/ResumenFinanciero'
 import ComparadorProveedores from '@/components/ComparadorProveedores'
 import ExcelButton from '@/components/ExcelButton'
+import SeccionesPresupuesto from '@/components/SeccionesPresupuesto'
 
 export default async function PresupuestoPage({ params }: { params: { id: string } }) {
   const user = getUser()
@@ -37,6 +38,11 @@ export default async function PresupuestoPage({ params }: { params: { id: string
     month: 'long',
     day: 'numeric',
   })
+
+  const asignacionesIniciales = (items || []).reduce((acc, item) => {
+  if (item.seccion) acc[item.id] = item.seccion
+  return acc
+}, {} as Record<string, string>)
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -152,7 +158,17 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           </div>
         </div>
 
-        
+        <SeccionesPresupuesto
+          items={(items || []).map(item => ({
+            id: item.id,
+            descripcion: item.descripcion,
+            unidad: item.unidad,
+            cantidad: Number(item.cantidad),
+            precio_unitario: Number(item.precio_unitario),
+            subtotal: Number(item.subtotal),
+          }))}
+          asignacionesIniciales={asignacionesIniciales}
+        />
 
         {/* Lista de compras */}
         <ListaCompras
@@ -168,7 +184,12 @@ export default async function PresupuestoPage({ params }: { params: { id: string
           presupuestoId={presupuesto.id}
         />
 
-        <ResumenFinanciero subtotal={Number(presupuesto.total)} />
+        <ResumenFinanciero
+          subtotal={Number(presupuesto.total)}
+          presupuestoId={presupuesto.id}
+          imprevistosInicial={Number(presupuesto.imprevistos_pct ?? 5)}
+          utilidadInicial={Number(presupuesto.utilidad_pct ?? 10)}
+        />
 
         <ComparadorProveedores
           items={(items || []).map(item => ({

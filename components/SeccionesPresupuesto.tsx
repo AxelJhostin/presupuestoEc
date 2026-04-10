@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronDown, ChevronRight, LayoutGrid } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 
 interface Item {
   id: string
@@ -14,6 +15,7 @@ interface Item {
 
 interface Props {
   items: Item[]
+  asignacionesIniciales?: Record<string, string>
 }
 
 const SECCIONES_DEFAULT = [
@@ -28,20 +30,24 @@ const SECCIONES_DEFAULT = [
   'Otros',
 ]
 
-export default function SeccionesPresupuesto({ items }: Props) {
-  const [asignaciones, setAsignaciones] = useState<Record<string, string>>({})
+export default function SeccionesPresupuesto({ items, asignacionesIniciales = {} }: Props) {
+  const supabase = createClient()
+  const [asignaciones, setAsignaciones] = useState<Record<string, string>>(asignacionesIniciales)
   const [expandidas, setExpandidas] = useState<Record<string, boolean>>({})
   const [mostrar, setMostrar] = useState(false)
 
-  function asignarSeccion(itemId: string, seccion: string) {
+  async function asignarSeccion(itemId: string, seccion: string) {
     setAsignaciones(prev => ({ ...prev, [itemId]: seccion }))
+    await supabase
+      .from('items_presupuesto')
+      .update({ seccion: seccion || null })
+      .eq('id', itemId)
   }
 
   function toggleSeccion(nombre: string) {
     setExpandidas(prev => ({ ...prev, [nombre]: !prev[nombre] }))
   }
 
-  // Agrupar items por sección
   const grupos: Record<string, Item[]> = {}
   items.forEach(item => {
     const seccion = asignaciones[item.id] || 'Sin asignar'
@@ -49,7 +55,6 @@ export default function SeccionesPresupuesto({ items }: Props) {
     grupos[seccion].push(item)
   })
 
-  // Secciones que tienen items asignados (excluyendo sin asignar)
   const seccionesUsadas = Object.keys(grupos).filter(s => s !== 'Sin asignar')
   const itemsSinAsignar = grupos['Sin asignar'] || []
   const todosAsignados = itemsSinAsignar.length === 0
@@ -201,9 +206,8 @@ export default function SeccionesPresupuesto({ items }: Props) {
                 <div className="space-y-2">
                   {seccionesUsadas.map(seccion => {
                     const subtotal = grupos[seccion].reduce((acc, i) => acc + i.subtotal, 0)
-                    const porcentaje = items.reduce((acc, i) => acc + i.subtotal, 0) > 0
-                      ? (subtotal / items.reduce((acc, i) => acc + i.subtotal, 0)) * 100
-                      : 0
+                    const totalGeneral = items.reduce((acc, i) => acc + i.subtotal, 0)
+                    const porcentaje = totalGeneral > 0 ? (subtotal / totalGeneral) * 100 : 0
                     return (
                       <div key={seccion} className="flex items-center gap-3">
                         <div className="flex-1">
