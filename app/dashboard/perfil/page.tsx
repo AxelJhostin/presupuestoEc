@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ArrowLeft, User, Building2, Phone, Mail, Save } from 'lucide-react'
+import { Eye, EyeOff, Lock } from 'lucide-react'
 
 function validarTelefono(tel: string): boolean {
   if (!tel) return true
@@ -26,6 +27,14 @@ export default function PerfilPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [guardando, setGuardando] = useState(false)
+
+  // Cambio de contraseña
+  const [passwordActual, setPasswordActual] = useState('')
+  const [passwordNueva, setPasswordNueva] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [cambiandoPassword, setCambiandoPassword] = useState(false)
+  const [showActual, setShowActual] = useState(false)
+  const [showNueva, setShowNueva] = useState(false)
 
   useEffect(() => {
     async function cargarPerfil() {
@@ -95,6 +104,41 @@ export default function PerfilPage() {
         <p className="text-slate-400 text-sm">Cargando...</p>
       </div>
     )
+  }
+
+  async function handleCambiarPassword(e: React.FormEvent) {
+    e.preventDefault()
+
+    if (passwordNueva.length < 6) {
+      toast.error('La nueva contraseña debe tener al menos 6 caracteres.')
+      return
+    }
+
+    if (passwordNueva !== passwordConfirm) {
+      toast.error('Las contraseñas no coinciden.')
+      return
+    }
+
+    setCambiandoPassword(true)
+
+    const res = await fetch('/api/auth/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ passwordActual, passwordNueva }),
+    })
+
+    const data = await res.json()
+
+    if (!res.ok) {
+      toast.error(data.error)
+    } else {
+      toast.success('Contraseña actualizada.')
+      setPasswordActual('')
+      setPasswordNueva('')
+      setPasswordConfirm('')
+    }
+
+    setCambiandoPassword(false)
   }
 
   return (
@@ -244,8 +288,74 @@ export default function PerfilPage() {
               </div>
             </div>
           </div>
+        </div>  
 
+        {/* Cambio de contraseña */}
+        <div className="bg-white border border-slate-200 rounded-xl overflow-hidden mt-6">
+          <div className="px-6 py-4 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-900 flex items-center gap-2">
+              <Lock className="w-4 h-4 text-slate-400" />
+              Cambiar contraseña
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">Actualiza tu contraseña de acceso</p>
+          </div>
+          <form onSubmit={handleCambiarPassword} className="p-6 space-y-4">
+            <div className="space-y-1.5">
+              <Label>Contraseña actual</Label>
+              <div className="relative">
+                <Input
+                  type={showActual ? 'text' : 'password'}
+                  placeholder="Tu contraseña actual"
+                  value={passwordActual}
+                  onChange={e => setPasswordActual(e.target.value)}
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowActual(!showActual)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  {showActual ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Nueva contraseña</Label>
+              <div className="relative">
+                <Input
+                  type={showNueva ? 'text' : 'password'}
+                  placeholder="Mínimo 6 caracteres"
+                  value={passwordNueva}
+                  onChange={e => setPasswordNueva(e.target.value)}
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNueva(!showNueva)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  {showNueva ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Confirmar nueva contraseña</Label>
+              <Input
+                type="password"
+                placeholder="Repite la nueva contraseña"
+                value={passwordConfirm}
+                onChange={e => setPasswordConfirm(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" variant="outline" className="w-full" disabled={cambiandoPassword}>
+              {cambiandoPassword ? 'Actualizando...' : 'Cambiar contraseña'}
+            </Button>
+          </form>
         </div>
+
       </main>
     </div>
   )
