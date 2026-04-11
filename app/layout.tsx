@@ -98,7 +98,7 @@ export const metadata: Metadata = {
   },
 
   verification: {
-    google: 'b1c9503ecf985b49',
+    google: '4A0ENZpK_HddpNpziLuF9VSPHEsXljKluNSrpkgTTu4',
   },
 
   appLinks: {
