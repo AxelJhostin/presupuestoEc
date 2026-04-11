@@ -65,11 +65,11 @@ export const metadata: Metadata = {
     description: APP_DESCRIPTION,
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.svg',
         width: 1200,
         height: 630,
         alt: `${APP_NAME} — Generador de presupuestos de obra para Ecuador`,
-        type: 'image/png',
+        type: 'image/svg+xml',
       },
     ],
   },
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     creator: '@presupuestoec',
     title: `${APP_NAME} — Presupuestos de obra para Ecuador`,
     description: 'Cálculos NEC automáticos, APU, PDF y Excel. Para ingenieros y maestros de obra en Ecuador. Gratis.',
-    images: ['/og-image.png'],
+    images: ['/og-image.svg'],
   },
 
   robots: {
