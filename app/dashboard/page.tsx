@@ -7,6 +7,8 @@ import LogoutButton from '@/components/LogoutButton'
 import StatsBar from '@/components/dashboard/StatsBar'
 import FiltrosDashboard from '@/components/dashboard/FiltrosDashboard'
 import EmptyState from '@/components/dashboard/EmptyState'
+import BannerBienvenida from '@/components/dashboard/BannerBienvenida'
+
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -19,6 +21,12 @@ export default async function DashboardPage() {
     .eq('user_id', user.userId)
     .eq('es_plantilla', false)
     .order('fecha', { ascending: false })
+
+  const { data: perfil } = await supabase
+    .from('usuarios')
+    .select('onboarding_completado')
+    .eq('id', user.userId)
+    .single()
 
   const lista = presupuestos || []
   const calculadora = lista.filter(p => p.modo === 'calculadora').length
@@ -100,6 +108,11 @@ export default async function DashboardPage() {
       </div>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
+
+        {/* Banner bienvenida */}
+        {!perfil?.onboarding_completado && (
+          <BannerBienvenida userId={user.userId} />
+        )}
 
         {/* Stats */}
         <StatsBar
