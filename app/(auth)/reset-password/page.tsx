@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { CheckCircle2, XCircle, Eye, EyeOff } from 'lucide-react'
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const token = searchParams.get('token')
@@ -69,6 +69,103 @@ export default function ResetPasswordPage() {
   if (!token) return null
 
   return (
+    <>
+      {!exito ? (
+        <>
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900">Nueva contraseña</h2>
+            <p className="text-slate-500 text-sm mt-1">Ingresa y confirma tu nueva contraseña.</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Nueva contraseña</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Mínimo 6 caracteres"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {fortaleza && (
+                <div className="space-y-1">
+                  <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full transition-all ${fortaleza.color} ${fortaleza.ancho}`} />
+                  </div>
+                  <p className="text-xs text-slate-400">Fortaleza: <span className="font-medium">{fortaleza.label}</span></p>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="confirm">Confirmar contraseña</Label>
+              <div className="relative">
+                <Input
+                  id="confirm"
+                  type={showConfirm ? 'text' : 'password'}
+                  placeholder="Repite tu contraseña"
+                  value={confirm}
+                  onChange={e => setConfirm(e.target.value)}
+                  required
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {confirm && (
+                <div className="flex items-center gap-1.5">
+                  {password === confirm
+                    ? <><CheckCircle2 className="w-3.5 h-3.5 text-green-500" /><span className="text-xs text-green-600">Las contraseñas coinciden</span></>
+                    : <><XCircle className="w-3.5 h-3.5 text-red-400" /><span className="text-xs text-red-500">Las contraseñas no coinciden</span></>
+                  }
+                </div>
+              )}
+            </div>
+
+            <Button type="submit" className="w-full h-11" disabled={loading}>
+              {loading ? 'Guardando...' : 'Guardar nueva contraseña'}
+            </Button>
+          </form>
+        </>
+      ) : (
+        <div className="text-center">
+          <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle2 className="w-8 h-8 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">¡Contraseña actualizada!</h2>
+          <p className="text-slate-500 text-sm mb-6">
+            Tu contraseña fue cambiada exitosamente. Redirigiendo al login...
+          </p>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm"
+          >
+            Ir al login
+          </Link>
+        </div>
+      )}
+    </>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
     <div className="min-h-screen bg-slate-50 flex">
 
       {/* Panel izquierdo */}
@@ -116,96 +213,10 @@ export default function ResetPasswordPage() {
             <span className="text-slate-900 font-bold text-lg">PresupuestoEC</span>
           </div>
 
-          {!exito ? (
-            <>
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold text-slate-900">Nueva contraseña</h2>
-                <p className="text-slate-500 text-sm mt-1">Ingresa y confirma tu nueva contraseña.</p>
-              </div>
+          <Suspense fallback={<p className="text-slate-400 text-sm">Cargando...</p>}>
+            <ResetPasswordForm />
+          </Suspense>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="password">Nueva contraseña</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Mínimo 6 caracteres"
-                      value={password}
-                      onChange={e => setPassword(e.target.value)}
-                      required
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  {fortaleza && (
-                    <div className="space-y-1">
-                      <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full transition-all ${fortaleza.color} ${fortaleza.ancho}`} />
-                      </div>
-                      <p className="text-xs text-slate-400">Fortaleza: <span className="font-medium">{fortaleza.label}</span></p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="confirm">Confirmar contraseña</Label>
-                  <div className="relative">
-                    <Input
-                      id="confirm"
-                      type={showConfirm ? 'text' : 'password'}
-                      placeholder="Repite tu contraseña"
-                      value={confirm}
-                      onChange={e => setConfirm(e.target.value)}
-                      required
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirm(!showConfirm)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  {confirm && (
-                    <div className="flex items-center gap-1.5">
-                      {password === confirm
-                        ? <><CheckCircle2 className="w-3.5 h-3.5 text-green-500" /><span className="text-xs text-green-600">Las contraseñas coinciden</span></>
-                        : <><XCircle className="w-3.5 h-3.5 text-red-400" /><span className="text-xs text-red-500">Las contraseñas no coinciden</span></>
-                      }
-                    </div>
-                  )}
-                </div>
-
-                <Button type="submit" className="w-full h-11" disabled={loading}>
-                  {loading ? 'Guardando...' : 'Guardar nueva contraseña'}
-                </Button>
-              </form>
-            </>
-          ) : (
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 className="w-8 h-8 text-green-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">¡Contraseña actualizada!</h2>
-              <p className="text-slate-500 text-sm mb-6">
-                Tu contraseña fue cambiada exitosamente. Redirigiendo al login...
-              </p>
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm"
-              >
-                Ir al login
-              </Link>
-            </div>
-          )}
         </div>
       </div>
     </div>
