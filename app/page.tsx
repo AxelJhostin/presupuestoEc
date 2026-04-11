@@ -270,6 +270,8 @@ export default function LandingPage() {
           </div>
           <p className="text-xs text-slate-400">Generador de presupuestos de obra para Ecuador · Norma NEC · Manabí</p>
           <div className="flex items-center gap-4">
+            <Link href="/terminos" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Términos de uso</Link>
+            <Link href="/privacidad" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Privacidad</Link>
             <Link href="/login" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Ingresar</Link>
             <Link href="/register" className="text-xs text-slate-400 hover:text-slate-600 transition-colors">Registrarse</Link>
           </div>

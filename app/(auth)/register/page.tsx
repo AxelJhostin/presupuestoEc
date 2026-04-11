@@ -232,7 +232,10 @@ export default function RegisterPage() {
           </p>
 
           <p className="text-center text-xs text-slate-400 mt-4">
-            Al registrarte aceptas usar la plataforma de forma responsable.
+            Al registrarte aceptas nuestros{' '}
+            <Link href="/terminos" className="text-blue-600 hover:underline">Términos de uso</Link>
+            {' '}y{' '}
+            <Link href="/privacidad" className="text-blue-600 hover:underline">Política de privacidad</Link>.
           </p>
         </div>
       </div>
