@@ -13,6 +13,10 @@ export async function middleware(request: NextRequest) {
     path === '/' ||
     path.startsWith('/login') ||
     path.startsWith('/register') ||
+    path.startsWith('/forgot-password') ||
+    path.startsWith('/reset-password') ||
+    path.startsWith('/terminos') ||
+    path.startsWith('/privacidad') ||
     path.startsWith('/api/auth')
 
   if (!isAuth && !isPublic) {
