@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ArrowLeft, User, Building2, Phone, Mail, Save } from 'lucide-react'
+import { ArrowLeft, User, Building2, Phone, Mail, Save, Trash2 } from 'lucide-react'
 import { Eye, EyeOff, Lock } from 'lucide-react'
 
 function validarTelefono(tel: string): boolean {
@@ -27,6 +27,7 @@ export default function PerfilPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [guardando, setGuardando] = useState(false)
+  const [eliminando, setEliminando] = useState(false)
 
   // Cambio de contraseña
   const [passwordActual, setPasswordActual] = useState('')
@@ -139,6 +140,30 @@ export default function PerfilPage() {
     }
 
     setCambiandoPassword(false)
+  }
+
+  async function handleEliminarCuenta() {
+    const confirmacion = window.confirm(
+      '¿Estás seguro de que quieres eliminar tu cuenta? Esta acción es irreversible y eliminará todos tus presupuestos.'
+    )
+    if (!confirmacion) return
+
+    const confirmacion2 = window.confirm(
+      'Última confirmación: ¿Eliminar permanentemente tu cuenta y todos tus datos?'
+    )
+    if (!confirmacion2) return
+
+    setEliminando(true)
+
+    const res = await fetch('/api/auth/delete-account', { method: 'DELETE' })
+
+    if (res.ok) {
+      toast.success('Cuenta eliminada.')
+      window.location.href = '/'
+    } else {
+      toast.error('Error al eliminar la cuenta.')
+      setEliminando(false)
+    }
   }
 
   return (
@@ -354,6 +379,33 @@ export default function PerfilPage() {
               {cambiandoPassword ? 'Actualizando...' : 'Cambiar contraseña'}
             </Button>
           </form>
+        </div>
+
+        {/* Zona de peligro */}
+        <div className="bg-white border border-red-200 rounded-xl overflow-hidden mt-6">
+          <div className="px-6 py-4 border-b border-red-100 bg-red-50">
+            <h2 className="font-semibold text-red-700 flex items-center gap-2">
+              <Trash2 className="w-4 h-4" />
+              Zona de peligro
+            </h2>
+            <p className="text-xs text-red-400 mt-0.5">Acciones irreversibles</p>
+          </div>
+          <div className="p-6 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-slate-700">Eliminar cuenta</p>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Elimina permanentemente tu cuenta y todos tus presupuestos. Esta acción no se puede deshacer.
+              </p>
+            </div>
+            <button
+              onClick={handleEliminarCuenta}
+              disabled={eliminando}
+              className="shrink-0 flex items-center gap-2 border border-red-300 text-red-600 hover:bg-red-50 text-sm font-medium px-4 py-2 rounded-lg transition-colors disabled:opacity-50"
+            >
+              <Trash2 className="w-4 h-4" />
+              {eliminando ? 'Eliminando...' : 'Eliminar cuenta'}
+            </button>
+          </div>
         </div>
 
       </main>
