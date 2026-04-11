@@ -138,6 +138,9 @@ export default function RootLayout({
         <meta name="msapplication-TileColor" content="#1D4ED8" />
         <meta name="format-detection" content="telephone=no" />
         <link rel="canonical" href={APP_URL} />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
       </head>
       <body className={`${ibmPlexSans.variable} font-sans antialiased bg-slate-50 text-slate-900`}>
         {children}
